@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#fdf6f0">
+    <title>瞬时网格</title>
+    <link rel="stylesheet" href="./css/grid.css">
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <h1>瞬时网格</h1>
+            <div class="best">最好 <b id="best">0</b> 关</div>
+        </header>
+
+        <div class="stage">
+            <div class="grid" id="grid"></div>
+            <div class="prompt" id="prompt">点击开始，记住亮起的格子</div>
+        </div>
+
+        <div class="bar"><i id="bar"></i></div>
+
+        <footer class="foot">
+            <span class="progress" id="progress">第 1 关 · 3×3 · 3 格</span>
+            <button id="start" class="act" type="button">开始</button>
+        </footer>
+
+        <div class="overlay hidden" id="overlay">
+            <h2 id="ov-title">游戏结束</h2>
+            <p id="ov-text"></p>
+            <button id="ov-btn" class="primary" type="button">再试一次</button>
+        </div>
+    </div>
+
+    <script src="./js/grid.js"></script>
+</body>
+</html>

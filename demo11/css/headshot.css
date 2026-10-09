@@ -167,37 +167,75 @@ body {
     display: block;
 }
 
-/* 敌人 */
+/* 敌人：人形剪影 */
 .enemy {
     position: absolute;
-    width: 60px;
-    height: 60px;
-    border-radius: 50% 50% 44% 44%;
-    background: radial-gradient(circle at 50% 32%, #4b5b74 0%, #33415a 60%, #232c3d 100%);
-    box-shadow: inset 0 -6px 12px rgba(0, 0, 0, 0.35), 0 6px 14px -6px rgba(0, 0, 0, 0.8);
-    transition: opacity 0.25s ease, transform 0.12s ease;
     will-change: left, top;
+}
+
+.enemy .fig {
+    position: absolute;
+    inset: 0;
+    transition: opacity 0.25s ease, transform 0.22s ease;
+    transform-origin: 50% 90%;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
 }
 
 .enemy .head {
     position: absolute;
     left: 50%;
-    top: 13%;
-    width: 36%;
-    height: 36%;
+    top: 0;
+    width: 30%;
+    height: 30%;
     transform: translateX(-50%);
     border-radius: 50%;
-    background: radial-gradient(circle at 45% 35%, #ffd27a 0%, #ffb020 60%, #d98b12 100%);
-    box-shadow: 0 0 8px rgba(255, 176, 32, 0.5);
+    background: radial-gradient(circle at 44% 34%, #ffd27a 0%, #e8865a 60%, #b9552f 100%);
+    box-shadow: 0 0 10px rgba(255, 150, 80, 0.65);
 }
 
-.enemy.body-hit {
-    background: radial-gradient(circle at 50% 32%, #7a4b4b 0%, #5a3341 70%);
+.enemy .torso {
+    position: absolute;
+    left: 27%;
+    top: 28%;
+    width: 46%;
+    height: 41%;
+    border-radius: 34% 34% 22% 22%;
+    background: linear-gradient(180deg, #3b4657, #2a3341);
 }
 
-.enemy.dead {
+.enemy .arm {
+    position: absolute;
+    top: 31%;
+    width: 13%;
+    height: 33%;
+    border-radius: 7px;
+    background: #333d4e;
+}
+
+.enemy .arm.l { left: 14%; }
+.enemy .arm.r { right: 14%; }
+
+.enemy .leg {
+    position: absolute;
+    top: 66%;
+    width: 17%;
+    height: 32%;
+    border-radius: 5px;
+    background: #2b3544;
+}
+
+.enemy .leg.l { left: 28%; }
+.enemy .leg.r { right: 28%; }
+
+.enemy.body-hit .torso,
+.enemy.body-hit .arm,
+.enemy.body-hit .leg {
+    background: #5a3341;
+}
+
+.enemy.dead .fig {
     opacity: 0;
-    transform: scale(0.4);
+    transform: scale(0.55) rotate(8deg);
 }
 
 /* 爆炸桶 */
@@ -260,6 +298,35 @@ body {
 @keyframes floatUp {
     from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     to { opacity: 0; transform: translate(-50%, -160%) scale(1.15); }
+}
+
+/* 第一人称枪械 */
+.gun {
+    position: absolute;
+    left: 50%;
+    bottom: -3%;
+    width: 46%;
+    max-width: 210px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 2;
+    transition: transform 0.16s ease, opacity 0.16s ease;
+    filter: drop-shadow(0 -6px 16px rgba(0, 0, 0, 0.55));
+}
+
+.gun svg { display: block; width: 100%; height: auto; }
+
+.scene.aiming .gun {
+    opacity: 0;
+    transform: translateX(-50%) translateY(90px);
+}
+
+.gun.recoil { animation: recoil 0.12s ease; }
+
+@keyframes recoil {
+    0% { transform: translateX(-50%) translateY(0); }
+    40% { transform: translateX(-50%) translateY(16px) rotate(2deg); }
+    100% { transform: translateX(-50%) translateY(0); }
 }
 
 .banner {

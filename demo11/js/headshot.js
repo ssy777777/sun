@@ -23,8 +23,39 @@
     var bestEl = document.getElementById('best');
     var bestUnit = document.getElementById('best-unit');
     var weaponsEl = document.getElementById('weapons');
+    var gunEl = document.getElementById('gun');
     var infoEl = document.getElementById('info');
     var menuBtn = document.getElementById('menu');
+
+    var GUN_SVG = [
+        // 沙漠之鹰（手枪）
+        '<svg viewBox="0 0 120 170">' +
+        '<rect x="46" y="8" width="28" height="78" rx="7" fill="#3b4657"/>' +
+        '<rect x="50" y="12" width="9" height="66" rx="4" fill="#4c5768"/>' +
+        '<rect x="54" y="2" width="12" height="8" rx="2" fill="#1c2129"/>' +
+        '<rect x="40" y="82" width="40" height="24" rx="7" fill="#2f3846"/>' +
+        '<path d="M47 104 L73 104 L80 156 L54 156 Z" fill="#242b36"/>' +
+        '<rect x="44" y="86" width="32" height="4" rx="2" fill="#525d70"/>' +
+        '</svg>',
+        // AWM 狙击枪
+        '<svg viewBox="0 0 120 190">' +
+        '<rect x="55" y="2" width="10" height="96" rx="3" fill="#39424f"/>' +
+        '<rect x="49" y="44" width="22" height="12" rx="4" fill="#2a313c"/>' +
+        '<circle cx="60" cy="40" r="8" fill="#3a4553"/>' +
+        '<circle cx="60" cy="40" r="4" fill="#10151c"/>' +
+        '<rect x="42" y="92" width="36" height="46" rx="8" fill="#2c3644"/>' +
+        '<path d="M46 132 L74 132 L80 182 L52 182 Z" fill="#222a34"/>' +
+        '<rect x="50" y="98" width="20" height="5" rx="2" fill="#4a5666"/>' +
+        '</svg>',
+        // 黄金巴祖卡（火箭筒）
+        '<svg viewBox="0 0 140 200">' +
+        '<rect x="46" y="30" width="48" height="120" rx="16" fill="#4a5540"/>' +
+        '<path d="M58 6 L82 6 L76 32 L64 32 Z" fill="#e0a828"/>' +
+        '<rect x="38" y="118" width="64" height="18" rx="8" fill="#2a3226"/>' +
+        '<rect x="52" y="132" width="36" height="26" rx="6" fill="#2f3829"/>' +
+        '<rect x="40" y="66" width="60" height="6" rx="3" fill="#8a6412"/>' +
+        '</svg>'
+    ];
 
     var W = 0, H = 0;
     var mode = 'level';
@@ -147,9 +178,12 @@
         el.style.top = '0';
         el.style.width = size + 'px';
         el.style.height = size + 'px';
-        var head = document.createElement('div');
-        head.className = 'head';
-        el.appendChild(head);
+        var fig = document.createElement('div');
+        fig.className = 'fig';
+        fig.innerHTML = '<div class="head"></div><div class="torso"></div>' +
+            '<div class="arm l"></div><div class="arm r"></div>' +
+            '<div class="leg l"></div><div class="leg r"></div>';
+        el.appendChild(fig);
         fieldEl.appendChild(el);
 
         var e = {
@@ -159,8 +193,8 @@
             hp: 2,
             alive: true,
             vx: 0,
-            hcx: 0, hcy: 0, hr: size * 0.18,
-            bcx: 0, bcy: 0, br: size * 0.5
+            hcx: 0, hcy: 0, hr: size * 0.15,
+            bcx: 0, bcy: 0, br: size * 0.36
         };
         e.x = 8 + Math.random() * (W - size - 16);
         e.y = 30 + Math.random() * (H - size - 80);
@@ -175,7 +209,7 @@
     function placeEnemy(e) {
         e.el.style.transform = 'translate(' + e.x + 'px,' + e.y + 'px)';
         e.hcx = e.x + e.size / 2;
-        e.hcy = e.y + e.size * 0.31;
+        e.hcy = e.y + e.size * 0.15;
         e.bcx = e.x + e.size / 2;
         e.bcy = e.y + e.size * 0.55;
     }
@@ -261,6 +295,9 @@
         if (!running || levelEnding) return;
         var wpn = WEAPONS[weaponIdx];
         sndShot();
+        gunEl.classList.remove('recoil');
+        void gunEl.offsetWidth;
+        gunEl.classList.add('recoil');
         if (mode === 'level') ammo--;
 
         if (wpn.explosive) {
@@ -516,6 +553,11 @@
                 weaponsEl.appendChild(b);
             })(i);
         }
+        applyGun();
+    }
+
+    function applyGun() {
+        gunEl.innerHTML = GUN_SVG[weaponIdx] || '';
     }
 
     function showActions(list) {

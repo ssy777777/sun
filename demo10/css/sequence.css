@@ -1,0 +1,244 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #101321;
+    --panel: #1a1f33;
+    --line: #2b3350;
+    --text: #e8ecff;
+    --muted: #8790bb;
+    --accent: #5b8cff;
+}
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    color: var(--text);
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: radial-gradient(circle at 30% 8%, #1c2240 0%, var(--bg) 55%, #070912 100%);
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    max-width: 440px;
+}
+
+.top {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.top h1 {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.best {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.best b {
+    color: #93e7ff;
+    font-size: 18px;
+    font-variant-numeric: tabular-nums;
+}
+
+.stage {
+    position: relative;
+    width: 100%;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 12px;
+    box-shadow: 0 20px 50px -26px rgba(0, 0, 0, 0.8);
+    touch-action: manipulation;
+}
+
+.tile {
+    --c: #5b8cff;
+    border: none;
+    border-radius: 14px;
+    background: var(--c);
+    opacity: 0.42;
+    cursor: pointer;
+    transition: opacity 0.12s ease, transform 0.1s ease, box-shadow 0.12s ease;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.tile:active {
+    transform: scale(0.96);
+}
+
+.tile.flash {
+    opacity: 1;
+    transform: scale(1.04);
+    box-shadow: 0 0 26px 2px var(--c), inset 0 0 18px rgba(255, 255, 255, 0.5);
+}
+
+.tile.good {
+    opacity: 1;
+    box-shadow: inset 0 0 0 3px #fff;
+}
+
+.tile.wrong {
+    opacity: 1;
+    background: #e5484d;
+    box-shadow: 0 0 24px #e5484d;
+}
+
+.overlay-msg {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -4px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #93e7ff;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.overlay-msg.show {
+    opacity: 1;
+}
+
+.hud {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.progress {
+    font-size: 14px;
+    color: var(--muted);
+}
+
+.act {
+    border: 1px solid var(--line);
+    background: var(--panel);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.act.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #08122b;
+}
+
+.act:active {
+    transform: scale(0.96);
+}
+
+.foot {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.primary {
+    border: none;
+    border-radius: 12px;
+    padding: 13px 44px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #08122b;
+    background: linear-gradient(135deg, #7fb0ff, #43e0c0);
+    cursor: pointer;
+}
+
+.primary:active {
+    transform: scale(0.97);
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 10, 22, 0.8);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    text-align: center;
+    padding: 24px;
+    transition: opacity 0.2s ease;
+    z-index: 5;
+}
+
+.overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay h2 {
+    font-size: 26px;
+    color: #fff;
+}
+
+.overlay p {
+    font-size: 14px;
+    color: #c7cffb;
+    line-height: 1.7;
+}
+
+.overlay p b {
+    color: #fff;
+    font-size: 18px;
+}
+
+@media (max-width: 560px) {
+    body {
+        padding: 10px;
+        align-items: flex-start;
+    }
+
+    .app {
+        gap: 10px;
+    }
+
+    .top h1 {
+        font-size: 20px;
+    }
+}

@@ -62,7 +62,7 @@
     var DIFF = {
         easy: { think: 0.42, speed: 0.82, range: 1, mistake: 0.30, power: 0, bombs: 1, aggressive: false, hunter: false },
         hard: { think: 0.15, speed: 1.0, range: 2, mistake: 0.06, power: 0, bombs: 1, aggressive: false, hunter: false },
-        nightmare: { think: 0.06, speed: 1.35, range: 4, mistake: 0, power: 1, bombs: 1, aggressive: true, hunter: true }
+        nightmare: { think: 0.06, speed: 1.5, range: 6, mistake: 0, power: 2, bombs: 1, aggressive: true, hunter: true }
     };
 
     var audioCtx = null;
@@ -520,19 +520,32 @@
         var pty = tileOfY(player.y);
         var pdist = Math.abs(ex - ptx) + Math.abs(ey - pty);
 
-        // 与玩家同一行/列、中间无阻挡且在威力范围内 → 直接放泡命中
-        var alignedClear = false;
-        if (ex === ptx || ey === pty) {
-            var dx = ptx === ex ? 0 : (ptx > ex ? 1 : -1);
-            var dy = pty === ey ? 0 : (pty > ey ? 1 : -1);
-            if (pdist > 0 && pdist <= e.power) {
-                var clearPath = true;
-                for (var s = 1; s <= pdist; s++) {
-                    if (tileAt(ex + dx * s, ey + dy * s) !== EMPTY) { clearPath = false; break; }
-                }
-                alignedClear = clearPath;
-            }
+        // 预判玩家走位（按当前移动方向提前一格）
+        var predX = ptx;
+        var predY = pty;
+        var pdir = inputDir(pressed1);
+        if (pdir === 'left') predX -= 1;
+        else if (pdir === 'right') predX += 1;
+        else if (pdir === 'up') predY -= 1;
+        else if (pdir === 'down') predY += 1;
+        if (predX < 0 || predY < 0 || predX >= COLS || predY >= ROWS || tileAt(predX, predY) !== EMPTY) {
+            predX = ptx;
+            predY = pty;
         }
+
+        // 与玩家（或其预判位置）同一行/列、中间无阻挡且在威力范围内 → 直接放泡命中
+        var alignedShot = function (tx, ty) {
+            if (!(ex === tx || ey === ty)) return false;
+            var ddx = tx === ex ? 0 : (tx > ex ? 1 : -1);
+            var ddy = ty === ey ? 0 : (ty > ey ? 1 : -1);
+            var dist = Math.abs(tx - ex) + Math.abs(ty - ey);
+            if (dist === 0 || dist > e.power) return false;
+            for (var s = 1; s <= dist; s++) {
+                if (tileAt(ex + ddx * s, ey + ddy * s) !== EMPTY) return false;
+            }
+            return true;
+        };
+        var alignedClear = alignedShot(ptx, pty) || alignedShot(predX, predY);
 
         if (bombs.length === 0 && explosions.length === 0 && e.activeBombs < e.maxBombs &&
             (adjBrick || pdist <= (e.bombRange || 2) || alignedClear)) {
@@ -572,6 +585,15 @@
 
         var s2b = findStep(ex, ey, chase, true, danger);
         if (s2b) return s2b.dir;
+
+        // 兜底：场上安全时随机走一步，避免原地卡死
+        if (bombs.length === 0 && explosions.length === 0) {
+            var opts = [];
+            for (var q = 0; q < DIRS.length; q++) {
+                if (canMove(e, e.x + DIRS[q][1] * 12, e.y + DIRS[q][2] * 12)) opts.push(DIRS[q][0]);
+            }
+            if (opts.length) return opts[Math.floor(Math.random() * opts.length)];
+        }
         return null;
     }
 

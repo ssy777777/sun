@@ -71,8 +71,12 @@
     }
 
     function fontSizeFor(v) {
-        if (v >= 1024) return cell * 0.30;
-        if (v >= 128) return cell * 0.38;
+        var s = String(v).length;
+        if (s >= 7) return cell * 0.17;
+        if (s >= 6) return cell * 0.20;
+        if (s >= 5) return cell * 0.24;
+        if (s >= 4) return cell * 0.30;
+        if (s >= 3) return cell * 0.38;
         return cell * 0.46;
     }
 
@@ -86,7 +90,7 @@
 
     function makeEl(tile, anim) {
         var el = document.createElement('div');
-        el.className = 'tile tile-' + (tile.value > 2048 ? 'super' : tile.value);
+        el.className = 'tile ' + (tile.value <= 65536 ? 'tile-' + tile.value : 'tile-huge');
         if (anim === 'new') el.classList.add('tile-new');
         else if (anim === 'merged') el.classList.add('tile-merged');
         var inner = document.createElement('div');
@@ -221,7 +225,13 @@
             });
         });
 
-        if (!moved) return;
+        if (!moved) {
+            if (!movesAvailable()) {
+                over = true;
+                showOverlay('游戏结束', '本局得分 ' + score, '再来一局', newGame, null, null);
+            }
+            return;
+        }
 
         var freshTile = addRandomTile();
         animate(startTiles, merges, freshTile);
@@ -253,13 +263,6 @@
     }
 
     function finish() {
-        if (won && !keepPlaying) {
-            won = false;
-            showOverlay('你赢了！', '达成 2048，继续挑战更高分吧',
-                '继续挑战', function () { keepPlaying = true; hideOverlay(); checkOver(); },
-                '重新开始', newGame);
-            return;
-        }
         if (!movesAvailable()) {
             over = true;
             showOverlay('游戏结束', '本局得分 ' + score,

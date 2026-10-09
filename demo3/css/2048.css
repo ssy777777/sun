@@ -173,7 +173,13 @@ body {
 .tile-512 .tile-inner { background: #edc850; color: #f9f6f2; }
 .tile-1024 .tile-inner { background: #edc53f; color: #f9f6f2; }
 .tile-2048 .tile-inner { background: #edc22e; color: #f9f6f2; box-shadow: 0 0 24px rgba(237, 194, 46, 0.7); }
-.tile-super .tile-inner { background: #3c3a32; color: #f9f6f2; }
+.tile-4096 .tile-inner { background: #3c3a32; color: #f9f6f2; box-shadow: 0 0 24px rgba(60, 58, 50, 0.7); }
+.tile-8192 .tile-inner { background: #6a4fa3; color: #f9f6f2; box-shadow: 0 0 24px rgba(106, 79, 163, 0.7); }
+.tile-16384 .tile-inner { background: #2f6fed; color: #f9f6f2; box-shadow: 0 0 26px rgba(47, 111, 237, 0.7); }
+.tile-32768 .tile-inner { background: #16a34a; color: #f9f6f2; box-shadow: 0 0 26px rgba(22, 163, 74, 0.7); }
+.tile-65536 .tile-inner { background: #dc2626; color: #f9f6f2; box-shadow: 0 0 28px rgba(220, 38, 38, 0.75); }
+.tile-huge .tile-inner { background: #0f172a; color: #67e8f9; box-shadow: 0 0 30px rgba(103, 232, 249, 0.8); }
+.tile-super .tile-inner { background: #0f172a; color: #67e8f9; }
 
 .overlay {
     position: absolute;

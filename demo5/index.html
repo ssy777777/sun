@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#f4f6fb">
+    <title>数独</title>
+    <link rel="stylesheet" href="./css/sudoku.css">
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <h1>数独</h1>
+            <div class="seg" id="diff-seg">
+                <button class="seg-btn" data-diff="easy" type="button">简单</button>
+                <button class="seg-btn active" data-diff="medium" type="button">中等</button>
+                <button class="seg-btn" data-diff="hard" type="button">困难</button>
+            </div>
+        </header>
+
+        <div class="stats">
+            <span>时间 <b id="timer">00:00</b></span>
+            <span>错误 <b id="mistakes">0</b></span>
+        </div>
+
+        <div class="board" id="board"></div>
+
+        <div class="pad">
+            <div class="nums" id="nums"></div>
+            <div class="pad-actions">
+                <button id="notes" class="act" type="button">笔记</button>
+                <button id="erase" class="act" type="button">擦除</button>
+                <button id="new" class="act" type="button">新局</button>
+            </div>
+        </div>
+
+        <div class="overlay hidden" id="overlay">
+            <h2 id="ov-title">完成！</h2>
+            <p id="ov-text"></p>
+            <button id="ov-btn" class="primary" type="button">再来一局</button>
+        </div>
+    </div>
+
+    <script src="./js/sudoku.js"></script>
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0f1226">
+    <title>俄罗斯方块</title>
+    <link rel="stylesheet" href="./css/tetris.css">
+</head>
+<body>
+    <div class="app">
+        <header class="app-header">
+            <h1>俄罗斯方块</h1>
+            <p class="subtitle">电脑：方向键 / 空格 　手机：触屏按钮或滑动</p>
+        </header>
+
+        <main class="game">
+            <section class="board-wrap">
+                <canvas id="board" width="300" height="600"></canvas>
+                <div id="combo" class="combo"></div>
+                <div id="overlay" class="overlay">
+                    <h2 id="overlay-title">准备好了吗？</h2>
+                    <p id="overlay-text">消除方块，挑战最高分</p>
+                    <div id="overlay-stats" class="overlay-stats"></div>
+                    <button id="overlay-btn" class="btn primary" type="button">开始游戏</button>
+                </div>
+            </section>
+
+            <aside class="panel">
+                <div class="stats">
+                    <div class="stat">
+                        <span class="stat-label">分数</span>
+                        <span id="score" class="stat-value">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">最高分</span>
+                        <span id="best" class="stat-value">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">等级</span>
+                        <span id="level" class="stat-value">1</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">消行</span>
+                        <span id="lines" class="stat-value">0</span>
+                    </div>
+                </div>
+
+                <div class="preview-row">
+                    <div class="next-box">
+                        <span class="stat-label">下一个</span>
+                        <canvas id="next" width="120" height="120"></canvas>
+                    </div>
+
+                    <div class="next-box">
+                        <span class="stat-label">暂存</span>
+                        <canvas id="hold" width="120" height="120"></canvas>
+                    </div>
+                </div>
+
+                <div class="panel-actions">
+                    <button id="pause-btn" class="btn" type="button" disabled>暂停</button>
+                    <button id="restart-btn" class="btn" type="button">重开</button>
+                    <button id="sound-btn" class="btn" type="button">音效开</button>
+                </div>
+
+                <ul class="tips">
+                    <li>← → 左右移动</li>
+                    <li>↑ 旋转　↓ 加速下落</li>
+                    <li>空格 直接落底　C 暂存</li>
+                    <li>P 暂停　R 重开</li>
+                </ul>
+            </aside>
+        </main>
+
+        <section class="touch-controls" id="touch-controls">
+            <button class="touch-btn" data-action="left" type="button" aria-label="左移">◀</button>
+            <button class="touch-btn" data-action="rotate" type="button" aria-label="旋转">⟳</button>
+            <button class="touch-btn" data-action="right" type="button" aria-label="右移">▶</button>
+            <button class="touch-btn" data-action="down" type="button" aria-label="下落">▼</button>
+            <button class="touch-btn" data-action="hold" type="button" aria-label="暂存">暂存</button>
+            <button class="touch-btn" data-action="drop" type="button" aria-label="落底">落底</button>
+        </section>
+    </div>
+
+    <script src="./js/tetris.js"></script>
+</body>
+</html>

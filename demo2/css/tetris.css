@@ -1,0 +1,491 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #0f1226;
+    --panel: #191c36;
+    --panel-2: #23264a;
+    --line: #2e3260;
+    --text: #e8ebff;
+    --muted: #8b90c4;
+    --accent: #5b8cff;
+    --accent-2: #43e0c0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    color: var(--text);
+    background: radial-gradient(circle at 30% 10%, #1b2050 0%, var(--bg) 55%, #080a18 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+.app {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.app-header {
+    text-align: center;
+}
+
+.app-header h1 {
+    font-size: 22px;
+    letter-spacing: 4px;
+}
+
+.subtitle {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.game {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.board-wrap {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
+    border: 1px solid var(--line);
+    background: #0b0e1e;
+    flex-shrink: 0;
+}
+
+#board {
+    display: block;
+    height: min(70dvh, 600px);
+    width: auto;
+    aspect-ratio: 1 / 2;
+    touch-action: none;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(9, 11, 24, 0.86);
+    backdrop-filter: blur(3px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    padding: 20px;
+    transition: opacity 0.2s ease;
+}
+
+.overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.overlay h2 {
+    font-size: 20px;
+}
+
+.overlay p {
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.combo {
+    position: absolute;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%) scale(0.6);
+    font-size: 22px;
+    font-weight: 800;
+    color: #ffe14d;
+    text-shadow: 0 0 14px rgba(255, 225, 77, 0.85), 0 2px 6px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    white-space: nowrap;
+    z-index: 2;
+}
+
+.combo.show {
+    opacity: 1;
+    transform: translateX(-50%) scale(1);
+}
+
+.overlay-stats {
+    width: 100%;
+    max-width: 240px;
+}
+
+.overlay-stats .stats-title {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+
+.overlay-stats .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px 10px;
+}
+
+.overlay-stats .stats-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 5px 8px;
+}
+
+.overlay-stats .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.overlay-stats .stats-item b {
+    margin-left: auto;
+    font-variant-numeric: tabular-nums;
+}
+
+.overlay-stats .stats-total {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 130px;
+    flex: 1;
+    max-width: 200px;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.stat {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.stat-label {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.preview-row {
+    display: flex;
+    gap: 8px;
+}
+
+.next-box {
+    flex: 1 1 0;
+    min-width: 0;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+#next,
+#hold {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.panel-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.btn {
+    flex: 1;
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--text);
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.08s ease, background 0.15s ease;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+}
+
+.btn:hover {
+    background: #2c3060;
+}
+
+.btn:active {
+    transform: scale(0.96);
+}
+
+.btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    border: none;
+    color: #08122b;
+    font-weight: 700;
+    padding: 12px 22px;
+}
+
+.tips {
+    list-style: none;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 10px 12px;
+}
+
+.touch-controls {
+    display: none;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.touch-btn {
+    border: 1px solid var(--line);
+    background: var(--panel-2);
+    color: var(--text);
+    border-radius: 12px;
+    padding: 16px 0;
+    font-size: 20px;
+    cursor: pointer;
+    touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.touch-btn:active {
+    background: var(--accent);
+    color: #08122b;
+}
+
+.touch-btn.wide {
+    grid-column: span 3;
+    font-size: 15px;
+    padding: 14px 0;
+}
+
+@media (pointer: coarse) {
+    .touch-controls {
+        display: grid;
+    }
+
+    .tips {
+        display: none;
+    }
+}
+
+@media (max-width: 560px) {
+    #board {
+        height: min(52dvh, 460px);
+    }
+}
+
+/* 手机 / 窄屏：整屏不滚动
+   [ 信息条 ]
+   [ 棋盘（暂存 / 下一个 半透明叠在顶部两角）]
+   [ 操作行 ] */
+html.mobile,
+html.mobile body {
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    padding: 8px;
+    align-items: stretch;
+}
+
+html.mobile .app {
+    height: 100%;
+    gap: 6px;
+}
+
+html.mobile .app-header {
+    display: none;
+}
+
+html.mobile .subtitle {
+    display: none;
+}
+
+html.mobile .game {
+    flex: 1 1 auto;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+        "stats"
+        "board"
+        "actions";
+    gap: 6px;
+    align-items: center;
+    justify-items: center;
+}
+
+/* 让面板的子元素直接参与 .game 的网格布局 */
+html.mobile .panel {
+    display: contents;
+}
+
+html.mobile .stats {
+    grid-area: stats;
+    justify-self: stretch;
+    width: 100%;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+}
+
+html.mobile .stat {
+    padding: 6px 8px;
+    gap: 0;
+    align-items: center;
+}
+
+html.mobile .stat-label {
+    font-size: 10px;
+}
+
+html.mobile .stat-value {
+    font-size: 16px;
+}
+
+html.mobile .stat:first-child .stat-value {
+    color: var(--accent-2);
+}
+
+html.mobile .board-wrap {
+    grid-area: board;
+    align-self: center;
+    justify-self: center;
+    min-height: 0;
+}
+
+html.mobile .overlay {
+    z-index: 2;
+}
+
+html.mobile .combo {
+    z-index: 3;
+}
+
+/* 半透明预览，叠在棋盘顶部左右两角 */
+html.mobile .preview-row {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 1;
+}
+
+html.mobile .next-box {
+    flex: 0 0 auto;
+    width: 48px;
+    padding: 4px 3px;
+    background: rgba(15, 18, 38, 0.5);
+    border-color: rgba(46, 50, 96, 0.65);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+html.mobile .next-box .stat-label {
+    font-size: 9px;
+}
+
+html.mobile #next,
+html.mobile #hold {
+    width: 100%;
+    height: auto;
+}
+
+html.mobile .panel-actions {
+    grid-area: actions;
+    justify-self: stretch;
+    width: 100%;
+    flex-direction: row;
+    gap: 8px;
+    align-self: end;
+}
+
+html.mobile .btn {
+    padding: 9px 4px;
+    font-size: 13px;
+}
+
+html.mobile .tips {
+    display: none;
+}
+
+html.mobile .touch-controls {
+    flex: 0 0 auto;
+    gap: 8px;
+}
+
+html.mobile .touch-btn {
+    padding: 13px 0;
+}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#faf8ef">
+    <title>2048</title>
+    <link rel="stylesheet" href="./css/2048.css">
+</head>
+<body>
+    <div class="app">
+        <header class="app-header">
+            <h1>2048</h1>
+            <div class="scores">
+                <div class="score-box">
+                    <span class="score-label">分数</span>
+                    <strong id="score" class="score-value">0</strong>
+                </div>
+                <div class="score-box">
+                    <span class="score-label">最高</span>
+                    <strong id="best" class="score-value">0</strong>
+                </div>
+            </div>
+        </header>
+
+        <main class="board-area">
+            <div class="board" id="board">
+                <div class="grid-bg" id="grid-bg"></div>
+                <div class="tile-layer" id="tile-layer"></div>
+                <div class="overlay hidden" id="overlay">
+                    <h2 id="overlay-title"></h2>
+                    <p id="overlay-text"></p>
+                    <div class="overlay-actions">
+                        <button id="overlay-primary" class="btn primary" type="button"></button>
+                        <button id="overlay-secondary" class="btn" type="button"></button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="app-footer">
+            <p class="hint">电脑：方向键 / WASD　手机：滑动屏幕</p>
+            <button id="new-game" class="btn" type="button">重新开始</button>
+        </footer>
+    </div>
+
+    <script src="./js/2048.js"></script>
+</body>
+</html>

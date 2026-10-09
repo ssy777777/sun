@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#0d1117">
+    <meta name="theme-color" content="#0a0f16">
     <title>枪枪爆头</title>
     <link rel="stylesheet" href="./css/headshot.css">
 </head>
@@ -11,28 +11,34 @@
     <div class="app">
         <header class="top">
             <h1>枪枪爆头</h1>
-            <div class="best">最好 <b id="best">0</b></div>
+            <div class="best">最高 <b id="best">1</b><span id="best-unit"> 关</span></div>
         </header>
 
         <div class="hud">
+            <div class="hud-item"><span id="lbl-lv">关卡</span><b id="level">1</b></div>
             <div class="hud-item"><span>分数</span><b id="score">0</b></div>
             <div class="hud-item"><span>爆头</span><b id="hs">0</b></div>
-            <div class="hud-item"><span>命中率</span><b id="acc">100%</b></div>
-            <div class="hud-item"><span>时间</span><b id="time">30</b></div>
+            <div class="hud-item"><span>时间</span><b id="time">--</b></div>
         </div>
 
-        <div class="play" id="play">
-            <div class="crosshair-tip" id="tip">点击「开始」，朝头打</div>
+        <div class="scene" id="scene">
+            <div class="field" id="field"></div>
+            <div class="vignette"></div>
+            <div class="scope" id="scope"></div>
+            <div class="banner" id="banner">选择模式开始任务</div>
         </div>
+
+        <div class="weapons" id="weapons"></div>
 
         <footer class="foot">
-            <button id="start" class="primary" type="button">开始</button>
+            <span class="info" id="info">狙击手 · 暗杀任务</span>
+            <button id="menu" class="act" type="button">菜单</button>
         </footer>
 
-        <div class="overlay hidden" id="overlay">
-            <h2 id="ov-title">时间到！</h2>
-            <p id="ov-text"></p>
-            <button id="ov-btn" class="primary" type="button">再来一局</button>
+        <div class="overlay" id="overlay">
+            <h2 id="ov-title">枪枪爆头</h2>
+            <p id="ov-text">长按屏幕瞄准，松手开枪；命中头部一击必杀。</p>
+            <div class="actions" id="ov-actions"></div>
         </div>
     </div>
 

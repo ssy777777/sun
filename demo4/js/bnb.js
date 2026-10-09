@@ -60,9 +60,9 @@
     var pressed2 = [];
 
     var DIFF = {
-        easy: { think: 0.42, speed: 0.82, range: 1, mistake: 0.30, power: 0 },
-        hard: { think: 0.15, speed: 1.0, range: 2, mistake: 0.06, power: 0 },
-        nightmare: { think: 0.08, speed: 1.18, range: 3, mistake: 0, power: 1 }
+        easy: { think: 0.42, speed: 0.82, range: 1, mistake: 0.30, power: 0, bombs: 1, aggressive: false, hunter: false },
+        hard: { think: 0.15, speed: 1.0, range: 2, mistake: 0.06, power: 0, bombs: 1, aggressive: false, hunter: false },
+        nightmare: { think: 0.06, speed: 1.35, range: 4, mistake: 0, power: 1, bombs: 1, aggressive: true, hunter: true }
     };
 
     var audioCtx = null;
@@ -182,7 +182,12 @@
             aiDir: null,
             thinkInterval: 0.15,
             bombRange: 2,
-            mistake: 0
+            mistake: 0,
+            aggressive: false,
+            hunter: false,
+            fleeUntil: 0,
+            fleeX: 0,
+            fleeY: 0
         };
     }
 
@@ -212,6 +217,9 @@
                 b.thinkInterval = diff.think;
                 b.bombRange = diff.range;
                 b.mistake = diff.mistake;
+                b.maxBombs = diff.bombs;
+                b.aggressive = diff.aggressive;
+                b.hunter = diff.hunter;
                 entities.push(b);
                 bots.push(b);
             }
@@ -470,6 +478,19 @@
         var ex = tileOfX(e.x);
         var ey = tileOfY(e.y);
 
+        // 放下炸弹后进入"逃跑"状态：直奔安全点，期间不做别的
+        if (e.fleeUntil > performance.now()) {
+            if (!danger[ey][ex]) {
+                e.fleeUntil = 0;
+            } else {
+                var fleeGoal = function (x, y) { return x === e.fleeX && y === e.fleeY; };
+                var fs = findStep(ex, ey, fleeGoal, false, danger);
+                if (fs) return fs.dir;
+                var anySafe = findStep(ex, ey, function (x, y) { return !danger[y][x]; }, false, danger);
+                return anySafe ? anySafe.dir : null;
+            }
+        }
+
         if (danger[ey][ex]) {
             var safe = function (x, y) { return !danger[y][x]; };
             var step = findStep(ex, ey, safe, true, danger) || findStep(ex, ey, safe, false, danger);
@@ -477,8 +498,8 @@
             return null;
         }
 
-        // 场上还有未爆的炸弹/爆炸时，先老老实实待在安全处，别乱跑
-        if (bombs.length > 0 || explosions.length > 0) {
+        // 非"凶猛"难度：场上还有炸弹/爆炸时先老实待着（避免自爆）
+        if (!e.aggressive && (bombs.length > 0 || explosions.length > 0)) {
             return null;
         }
 
@@ -499,20 +520,46 @@
         var pty = tileOfY(player.y);
         var pdist = Math.abs(ex - ptx) + Math.abs(ey - pty);
 
-        if (e.activeBombs < e.maxBombs && (adjBrick || pdist <= (e.bombRange || 2))) {
+        // 与玩家同一行/列、中间无阻挡且在威力范围内 → 直接放泡命中
+        var alignedClear = false;
+        if (ex === ptx || ey === pty) {
+            var dx = ptx === ex ? 0 : (ptx > ex ? 1 : -1);
+            var dy = pty === ey ? 0 : (pty > ey ? 1 : -1);
+            if (pdist > 0 && pdist <= e.power) {
+                var clearPath = true;
+                for (var s = 1; s <= pdist; s++) {
+                    if (tileAt(ex + dx * s, ey + dy * s) !== EMPTY) { clearPath = false; break; }
+                }
+                alignedClear = clearPath;
+            }
+        }
+
+        if (bombs.length === 0 && explosions.length === 0 && e.activeBombs < e.maxBombs &&
+            (adjBrick || pdist <= (e.bombRange || 2) || alignedClear)) {
             var d2 = bombDangerAt(ex, ey, e.power, danger);
             // 允许沿着爆炸范围冲出去（在爆炸前逃离）
             var escape = findStep(ex, ey, function (x, y) { return !d2[y][x]; }, false, d2);
             if (escape) {
                 placeBomb(e);
+                e.fleeUntil = performance.now() + 1600;
+                e.fleeX = escape.x;
+                e.fleeY = escape.y;
                 return escape.dir;
             }
         }
+
+        var chase = function (x, y) { return x === ptx && y === pty; };
 
         if (items.length) {
             var goal = function (x, y) { return hasItemAt(x, y); };
             var s1 = findStep(ex, ey, goal, true, danger);
             if (s1) return s1.dir;
+        }
+
+        // 猎手难度：优先直接追击玩家（而非先挖箱子）
+        if (e.hunter) {
+            var s2 = findStep(ex, ey, chase, true, danger);
+            if (s2) return s2.dir;
         }
 
         // 朝向玩家方向的、紧挨箱子的落脚点，炸开箱子开路
@@ -523,9 +570,8 @@
             if (s3) return s3.dir;
         }
 
-        var chase = function (x, y) { return x === ptx && y === pty; };
-        var s2 = findStep(ex, ey, chase, true, danger);
-        if (s2) return s2.dir;
+        var s2b = findStep(ex, ey, chase, true, danger);
+        if (s2b) return s2b.dir;
         return null;
     }
 

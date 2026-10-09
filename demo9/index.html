@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#f3f2ff">
+    <title>翻牌配对</title>
+    <link rel="stylesheet" href="./css/match.css">
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <h1>翻牌配对</h1>
+            <div class="seg" id="diff-seg">
+                <button class="seg-btn active" data-diff="easy" type="button">4×4</button>
+                <button class="seg-btn" data-diff="medium" type="button">4×6</button>
+                <button class="seg-btn" data-diff="hard" type="button">6×6</button>
+            </div>
+        </header>
+
+        <div class="hud">
+            <div class="hud-item"><span>步数</span><b id="moves">0</b></div>
+            <div class="hud-item"><span>时间</span><b id="timer">0:00</b></div>
+            <div class="hud-item"><span>最好</span><b id="best">--</b></div>
+        </div>
+
+        <div class="board" id="board"></div>
+
+        <footer class="foot">
+            <span class="progress" id="progress">4×4 · 8 对</span>
+            <button id="restart" class="act" type="button">重新开始</button>
+        </footer>
+
+        <div class="overlay hidden" id="overlay">
+            <h2 id="ov-title">完成！</h2>
+            <p id="ov-text"></p>
+            <button id="ov-btn" class="primary" type="button">再来一局</button>
+        </div>
+    </div>
+
+    <script src="./js/match.js"></script>
+</body>
+</html>

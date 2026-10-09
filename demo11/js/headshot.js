@@ -29,31 +29,54 @@
 
     var GUN_SVG = [
         // 沙漠之鹰（手枪）
-        '<svg viewBox="0 0 120 170">' +
-        '<rect x="46" y="8" width="28" height="78" rx="7" fill="#3b4657"/>' +
-        '<rect x="50" y="12" width="9" height="66" rx="4" fill="#4c5768"/>' +
-        '<rect x="54" y="2" width="12" height="8" rx="2" fill="#1c2129"/>' +
-        '<rect x="40" y="82" width="40" height="24" rx="7" fill="#2f3846"/>' +
-        '<path d="M47 104 L73 104 L80 156 L54 156 Z" fill="#242b36"/>' +
-        '<rect x="44" y="86" width="32" height="4" rx="2" fill="#525d70"/>' +
+        '<svg viewBox="0 0 120 180">' +
+        '<defs>' +
+        '<linearGradient id="g0a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#606b7d"/><stop offset="0.5" stop-color="#3b4553"/><stop offset="1" stop-color="#222932"/></linearGradient>' +
+        '<linearGradient id="g0b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#333b47"/><stop offset="1" stop-color="#1a202a"/></linearGradient>' +
+        '</defs>' +
+        '<rect x="48" y="12" width="24" height="82" rx="6" fill="url(#g0a)"/>' +
+        '<rect x="52" y="16" width="6" height="70" rx="3" fill="#7d8aa0" opacity=".7"/>' +
+        '<rect x="54" y="4" width="12" height="10" rx="2" fill="#12161c"/>' +
+        '<rect x="43" y="86" width="34" height="22" rx="6" fill="url(#g0b)"/>' +
+        '<rect x="45" y="90" width="30" height="4" rx="2" fill="#828ea6" opacity=".85"/>' +
+        '<path d="M50 106 L70 106 L78 158 Q60 172 50 158 Z" fill="#242b36"/>' +
+        '<path d="M54 110 L67 110 L71 150 L56 150 Z" fill="#171d25"/>' +
+        '<rect x="46" y="118" width="28" height="5" rx="2.5" fill="#3b4553"/>' +
+        '<circle cx="60" cy="93" r="3.4" fill="#9aa6bd" opacity=".85"/>' +
         '</svg>',
         // AWM 狙击枪
-        '<svg viewBox="0 0 120 190">' +
-        '<rect x="55" y="2" width="10" height="96" rx="3" fill="#39424f"/>' +
-        '<rect x="49" y="44" width="22" height="12" rx="4" fill="#2a313c"/>' +
-        '<circle cx="60" cy="40" r="8" fill="#3a4553"/>' +
-        '<circle cx="60" cy="40" r="4" fill="#10151c"/>' +
-        '<rect x="42" y="92" width="36" height="46" rx="8" fill="#2c3644"/>' +
-        '<path d="M46 132 L74 132 L80 182 L52 182 Z" fill="#222a34"/>' +
-        '<rect x="50" y="98" width="20" height="5" rx="2" fill="#4a5666"/>' +
+        '<svg viewBox="0 0 120 200">' +
+        '<defs>' +
+        '<linearGradient id="g1a" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4c5666"/><stop offset="1" stop-color="#232a35"/></linearGradient>' +
+        '<radialGradient id="g1l" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#c8ecff"/><stop offset="1" stop-color="#2b4a66"/></radialGradient>' +
+        '</defs>' +
+        '<rect x="56" y="4" width="8" height="104" rx="3" fill="url(#g1a)"/>' +
+        '<rect x="58" y="6" width="3" height="100" fill="#7d8aa0" opacity=".6"/>' +
+        '<rect x="52" y="8" width="16" height="6" rx="3" fill="#1a1f27"/>' +
+        '<rect x="48" y="52" width="24" height="10" rx="4" fill="#2a313c"/>' +
+        '<circle cx="60" cy="46" r="9" fill="#39424f"/><circle cx="60" cy="46" r="6" fill="url(#g1l)"/>' +
+        '<circle cx="60" cy="46" r="1.7" fill="#0c1016"/>' +
+        '<rect x="42" y="104" width="36" height="44" rx="8" fill="#2c3644"/>' +
+        '<rect x="46" y="110" width="28" height="5" rx="2.5" fill="#4c5666"/>' +
+        '<rect x="50" y="122" width="20" height="20" rx="3" fill="#1c222b"/>' +
+        '<path d="M46 146 L74 146 L82 194 L52 194 Z" fill="#222a34"/>' +
+        '<rect x="58" y="150" width="8" height="40" rx="2" fill="#161b22"/>' +
         '</svg>',
         // 黄金巴祖卡（火箭筒）
-        '<svg viewBox="0 0 140 200">' +
-        '<rect x="46" y="30" width="48" height="120" rx="16" fill="#4a5540"/>' +
-        '<path d="M58 6 L82 6 L76 32 L64 32 Z" fill="#e0a828"/>' +
-        '<rect x="38" y="118" width="64" height="18" rx="8" fill="#2a3226"/>' +
-        '<rect x="52" y="132" width="36" height="26" rx="6" fill="#2f3829"/>' +
-        '<rect x="40" y="66" width="60" height="6" rx="3" fill="#8a6412"/>' +
+        '<svg viewBox="0 0 150 210">' +
+        '<defs>' +
+        '<linearGradient id="g2t" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6f7852"/><stop offset="0.5" stop-color="#4a5340"/><stop offset="1" stop-color="#2e3525"/></linearGradient>' +
+        '<linearGradient id="g2h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe89a"/><stop offset="1" stop-color="#c8912a"/></linearGradient>' +
+        '</defs>' +
+        '<path d="M55 8 L95 8 L87 42 L63 42 Z" fill="url(#g2h)"/>' +
+        '<rect x="50" y="40" width="50" height="120" rx="18" fill="url(#g2t)"/>' +
+        '<rect x="60" y="46" width="12" height="108" rx="6" fill="#818b62" opacity=".45"/>' +
+        '<rect x="42" y="72" width="66" height="10" rx="5" fill="#2c331f"/>' +
+        '<rect x="58" y="60" width="34" height="14" rx="4" fill="#3a4230"/>' +
+        '<rect x="40" y="140" width="70" height="18" rx="8" fill="#2a3226"/>' +
+        '<rect x="56" y="152" width="38" height="30" rx="7" fill="#333b2a"/>' +
+        '<rect x="62" y="182" width="26" height="22" rx="6" fill="#22281b"/>' +
+        '<circle cx="75" cy="120" r="5" fill="#c8912a"/>' +
         '</svg>'
     ];
 
@@ -184,6 +207,13 @@
             '<div class="arm l"></div><div class="arm r"></div>' +
             '<div class="leg l"></div><div class="leg r"></div>';
         el.appendChild(fig);
+
+        var covered = level >= 2 && Math.random() < Math.min(0.12 + level * 0.06, 0.45);
+        if (covered) {
+            var cov = document.createElement('div');
+            cov.className = 'cover';
+            el.appendChild(cov);
+        }
         fieldEl.appendChild(el);
 
         var e = {
@@ -193,6 +223,7 @@
             hp: 2,
             alive: true,
             vx: 0,
+            cover: covered,
             hcx: 0, hcy: 0, hr: size * 0.15,
             bcx: 0, bcy: 0, br: size * 0.36
         };
@@ -315,6 +346,8 @@
                 for (var k = enemies.length - 1; k >= 0; k--) {
                     var e2 = enemies[k];
                     if (!e2.alive) continue;
+                    // 有掩体的敌人，身体被挡住：打在掩体上不造成伤害
+                    if (e2.cover && fy > e2.y + e2.size * 0.34) continue;
                     if (Math.hypot(e2.bcx - fx, e2.bcy - fy) <= e2.br) {
                         e2.hp -= wpn.dmg;
                         e2.el.classList.add('body-hit');
@@ -478,11 +511,18 @@
         return { x: e.clientX - r.left, y: e.clientY - r.top };
     }
 
-    function aimToField(px, py, s) {
-        return {
-            x: (px - W / 2) / s + W / 2,
-            y: (py - H / 2) / s + H / 2
-        };
+    function setScope(px, py) {
+        scopeEl.style.left = px + 'px';
+        scopeEl.style.top = py + 'px';
+        sceneEl.style.setProperty('--ax', px + 'px');
+        sceneEl.style.setProperty('--ay', py + 'px');
+    }
+
+    // 放大镜以手指为中心：手指移到哪，就能看清哪里；可移动手指看全整个场景
+    function applyZoom(px, py) {
+        var s = WEAPONS[weaponIdx].zoom;
+        fieldEl.style.transform = 'translate(' + (px * (1 - s)).toFixed(1) + 'px,' +
+            (py * (1 - s)).toFixed(1) + 'px) scale(' + s + ')';
     }
 
     function startAim(e) {
@@ -491,31 +531,25 @@
         sceneEl.classList.add('aiming');
         var p = pointerScene(e);
         aimX = p.x; aimY = p.y;
-        scopeEl.style.left = p.x + 'px';
-        scopeEl.style.top = p.y + 'px';
-        sceneEl.style.setProperty('--ax', p.x + 'px');
-        sceneEl.style.setProperty('--ay', p.y + 'px');
-        fieldEl.style.transform = 'scale(' + WEAPONS[weaponIdx].zoom + ')';
+        setScope(p.x, p.y);
+        applyZoom(p.x, p.y);
     }
 
     function moveAim(e) {
         if (!aiming) return;
         var p = pointerScene(e);
         aimX = p.x; aimY = p.y;
-        scopeEl.style.left = p.x + 'px';
-        scopeEl.style.top = p.y + 'px';
-        sceneEl.style.setProperty('--ax', p.x + 'px');
-        sceneEl.style.setProperty('--ay', p.y + 'px');
+        setScope(p.x, p.y);
+        applyZoom(p.x, p.y);
     }
 
     function endAim(e) {
         if (!aiming) return;
         aiming = false;
         sceneEl.classList.remove('aiming');
-        fieldEl.style.transform = 'scale(1)';
+        fieldEl.style.transform = '';
         var p = pointerScene(e);
-        var f = aimToField(p.x, p.y, WEAPONS[weaponIdx].zoom);
-        fire(f.x, f.y);
+        fire(p.x, p.y);
     }
 
     // ---------- UI ----------

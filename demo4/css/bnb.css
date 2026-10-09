@@ -121,6 +121,70 @@ body {
     color: var(--muted);
 }
 
+.start-screen,
+.result-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.result-screen.hidden {
+    display: none;
+}
+
+.start-screen .sub {
+    font-size: 13px;
+}
+
+.seg {
+    display: flex;
+    background: rgba(10, 26, 48, 0.9);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 4px;
+    gap: 4px;
+}
+
+.seg-btn {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 8px 18px;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.seg-btn.active {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    color: #06243a;
+}
+
+.seg-label {
+    font-size: 11px;
+    margin-top: -6px;
+}
+
+.modes {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.modes .btn {
+    min-width: 120px;
+}
+
+.keys {
+    font-size: 11px;
+    line-height: 1.7;
+    max-width: 320px;
+}
+
 .btn {
     border: none;
     border-radius: 10px;

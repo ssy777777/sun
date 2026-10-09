@@ -34,6 +34,9 @@
     var powerEl = document.getElementById('p-power');
     var speedEl = document.getElementById('p-speed');
     var bombBtn = document.getElementById('bomb-btn');
+    var startScreen = document.getElementById('start-screen');
+    var resultScreen = document.getElementById('result-screen');
+    var diffSeg = document.getElementById('diff-seg');
 
     var DPR = Math.min(window.devicePixelRatio || 1, 2);
     canvas.width = W * DPR;
@@ -46,11 +49,21 @@
     var items = [];
     var entities = [];
     var player = null;
+    var player2 = null;
     var bots = [];
     var state = 'ready';
+    var mode = 'ai';
+    var difficulty = 'hard';
     var wins = 0;
     var lastTime = 0;
-    var pressed = [];
+    var pressed1 = [];
+    var pressed2 = [];
+
+    var DIFF = {
+        easy: { think: 0.42, speed: 0.82, range: 1, mistake: 0.30, power: 0 },
+        hard: { think: 0.15, speed: 1.0, range: 2, mistake: 0.06, power: 0 },
+        nightmare: { think: 0.08, speed: 1.18, range: 3, mistake: 0, power: 1 }
+    };
 
     var audioCtx = null;
 
@@ -166,7 +179,10 @@
             speedLv: 1,
             anim: 0,
             aiTimer: 0,
-            aiDir: null
+            aiDir: null,
+            thinkInterval: 0.15,
+            bombRange: 2,
+            mistake: 0
         };
     }
 
@@ -178,15 +194,27 @@
 
         var sp = spawnPoints();
         player = makeEntity(sp[0].x, sp[0].y, '#4ade80', false);
+        player2 = null;
         entities = [player];
-
         bots = [];
-        var botColors = ['#fb7185', '#60a5fa', '#fbbf24'];
-        var botCount = Math.min(1 + Math.floor(wins / 2), 3);
-        for (var i = 1; i <= botCount; i++) {
-            var b = makeEntity(sp[i].x, sp[i].y, botColors[i - 1], true);
-            entities.push(b);
-            bots.push(b);
+
+        if (mode === 'pvp') {
+            player2 = makeEntity(sp[1].x, sp[1].y, '#60a5fa', false);
+            entities.push(player2);
+        } else {
+            var diff = DIFF[difficulty] || DIFF.hard;
+            var botColors = ['#fb7185', '#e879f9', '#fbbf24'];
+            var botCount = Math.min(1 + Math.floor(wins / 2), 3);
+            for (var i = 1; i <= botCount; i++) {
+                var b = makeEntity(sp[i].x, sp[i].y, botColors[i - 1], true);
+                b.speed = SPEED_BASE * diff.speed;
+                b.power = 1 + diff.power;
+                b.thinkInterval = diff.think;
+                b.bombRange = diff.range;
+                b.mistake = diff.mistake;
+                entities.push(b);
+                bots.push(b);
+            }
         }
 
         state = 'playing';
@@ -281,29 +309,56 @@
             (e.y + half > bt) && (e.y - half < bt + TS);
     }
 
+    function nearestCenter(v) {
+        return Math.round((v - TS / 2) / TS) * TS + TS / 2;
+    }
+
     function moveEntity(e, dir, dt) {
-        var d = e.speed * dt;
         var info = null;
         for (var i = 0; i < DIRS.length; i++) {
             if (DIRS[i][0] === dir) info = DIRS[i];
         }
         if (!info) return;
-        var nx = e.x + info[1] * d;
-        var ny = e.y + info[2] * d;
-        if (canMove(e, nx, ny)) {
-            e.x = nx;
-            e.y = ny;
+        var d = e.speed * dt;
+        var vertical = info[2] !== 0;
+
+        if (vertical) {
+            var cX = nearestCenter(e.x);
+            var offX = cX - e.x;
+            if (Math.abs(offX) > 0.6) {
+                var ax = offX > 0 ? Math.min(offX, d) : Math.max(offX, -d);
+                if (canMove(e, e.x + ax, e.y)) e.x += ax;
+                return;
+            }
+            e.x = cX;
+            if (canMove(e, e.x, e.y + info[2] * d)) e.y += info[2] * d;
+        } else {
+            var cY = nearestCenter(e.y);
+            var offY = cY - e.y;
+            if (Math.abs(offY) > 0.6) {
+                var ay = offY > 0 ? Math.min(offY, d) : Math.max(offY, -d);
+                if (canMove(e, e.x, e.y + ay)) e.y += ay;
+                return;
+            }
+            e.y = cY;
+            if (canMove(e, e.x + info[1] * d, e.y)) e.x += info[1] * d;
         }
     }
 
-    function inputDir() {
-        return pressed.length ? pressed[pressed.length - 1] : null;
+    function inputDir(list) {
+        return list.length ? list[list.length - 1] : null;
     }
 
     function updatePlayer(dt) {
         if (!player.alive) return;
-        var dir = inputDir();
+        var dir = inputDir(pressed1);
         if (dir) moveEntity(player, dir, dt);
+    }
+
+    function updatePlayer2(dt) {
+        if (!player2 || !player2.alive) return;
+        var dir = inputDir(pressed2);
+        if (dir) moveEntity(player2, dir, dt);
     }
 
     function computeDanger() {
@@ -427,6 +482,15 @@
             return null;
         }
 
+        // 低难度会偶尔"犯傻"，随机走一步
+        if (e.mistake && Math.random() < e.mistake) {
+            var choices = [];
+            for (var m = 0; m < DIRS.length; m++) {
+                if (canMove(e, e.x + DIRS[m][1] * 12, e.y + DIRS[m][2] * 12)) choices.push(DIRS[m][0]);
+            }
+            if (choices.length) return choices[Math.floor(Math.random() * choices.length)];
+        }
+
         var adjBrick = false;
         for (var k = 0; k < DIRS.length; k++) {
             if (tileAt(ex + DIRS[k][1], ey + DIRS[k][2]) === BRICK) { adjBrick = true; break; }
@@ -435,7 +499,7 @@
         var pty = tileOfY(player.y);
         var pdist = Math.abs(ex - ptx) + Math.abs(ey - pty);
 
-        if (e.activeBombs < e.maxBombs && (adjBrick || pdist <= 2)) {
+        if (e.activeBombs < e.maxBombs && (adjBrick || pdist <= (e.bombRange || 2))) {
             var d2 = bombDangerAt(ex, ey, e.power, danger);
             // 允许沿着爆炸范围冲出去（在爆炸前逃离）
             var escape = findStep(ex, ey, function (x, y) { return !d2[y][x]; }, false, d2);
@@ -471,7 +535,7 @@
             if (!e.alive) continue;
             e.aiTimer -= dt;
             if (e.aiTimer <= 0) {
-                e.aiTimer = 0.12;
+                e.aiTimer = e.thinkInterval || 0.15;
                 e.aiDir = computeAiDir(e);
             }
             if (e.aiDir) moveEntity(e, e.aiDir, dt);
@@ -523,7 +587,8 @@
     function update(dt) {
         if (state !== 'playing') return;
         updatePlayer(dt);
-        updateBots(dt);
+        if (mode === 'pvp') updatePlayer2(dt);
+        else updateBots(dt);
 
         for (var i = bombs.length - 1; i >= 0; i--) {
             bombs[i].timer -= dt;
@@ -540,14 +605,28 @@
         pickupItems();
         checkDeaths();
 
-        if (!player.alive) {
-            state = 'over';
-            showOverlay('被炸到了！', '本局失败，连胜 ' + wins, '重新开始', function () { wins = 0; reset(); });
-        } else if (aliveBots() === 0) {
-            state = 'over';
-            wins++;
-            showOverlay('胜利！', '干得漂亮，连胜 ' + wins, '下一局', function () { reset(); });
+        if (mode === 'pvp') {
+            var p1 = player.alive;
+            var p2 = player2 && player2.alive;
+            if (!p1 || !p2) {
+                state = 'over';
+                var msg = (!p1 && !p2) ? '同时出局，平局！' : (!p2 ? '玩家1 获胜！' : '玩家2 获胜！');
+                showResult('本局结束', msg, '再来一局', function () { reset(); });
+            }
+        } else {
+            if (!player.alive) {
+                state = 'over';
+                showResult('被炸到了！', '本局失败，连胜 ' + wins, '重新开始', function () { wins = 0; reset(); });
+            } else if (aliveBots() === 0) {
+                state = 'over';
+                wins++;
+                showResult('胜利！', surp(wins), '下一局', function () { reset(); });
+            }
         }
+    }
+
+    function surp(n) {
+        return '干得漂亮，连胜 ' + n;
     }
 
     // ---------- 渲染 ----------
@@ -568,23 +647,28 @@
                 var px = x * TS;
                 var py = y * TS;
                 if (m === WALL) {
-                    ctx.fillStyle = '#2b4a7a';
+                    ctx.fillStyle = '#0d1729';
                     ctx.fillRect(px, py, TS, TS);
-                    ctx.fillStyle = '#356092';
-                    ctx.fillRect(px + 2, py + 2, TS - 4, TS - 6);
-                    ctx.fillStyle = '#1c3557';
-                    ctx.fillRect(px + 2, py + TS - 6, TS - 4, 4);
+                    ctx.fillStyle = '#25375c';
+                    ctx.fillRect(px + 3, py + 3, TS - 6, TS - 8);
+                    ctx.fillStyle = '#4a6aa0';
+                    ctx.fillRect(px + 3, py + 3, TS - 6, 4);
+                    ctx.fillStyle = '#0a1120';
+                    ctx.fillRect(px + 3, py + TS - 7, TS - 6, 4);
                 } else if (m === BRICK) {
-                    ctx.fillStyle = '#a9744a';
+                    ctx.fillStyle = '#9c5a34';
                     ctx.fillRect(px + 1, py + 1, TS - 2, TS - 2);
-                    ctx.fillStyle = '#c78d5c';
-                    ctx.fillRect(px + 3, py + 3, TS - 6, (TS - 6) / 2 - 2);
-                    ctx.fillRect(px + 3, py + TS / 2 + 2, TS - 6, (TS - 6) / 2 - 2);
-                    ctx.strokeStyle = 'rgba(0,0,0,0.15)';
-                    ctx.strokeRect(px + 1.5, py + 1.5, TS - 3, TS - 3);
+                    ctx.fillStyle = '#d69a67';
+                    ctx.fillRect(px + 4, py + 4, TS - 8, (TS - 10) / 2);
+                    ctx.fillRect(px + 4, py + TS / 2 + 1, TS - 8, (TS - 10) / 2);
+                    ctx.strokeStyle = 'rgba(40, 20, 8, 0.55)';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(px + 2, py + 2, TS - 4, TS - 4);
                 } else {
-                    ctx.fillStyle = ((x + y) % 2 === 0) ? '#17558f' : '#14497c';
+                    ctx.fillStyle = ((x + y) % 2 === 0) ? '#3a78bd' : '#3571b3';
                     ctx.fillRect(px, py, TS, TS);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.06)';
+                    ctx.fillRect(px, py, TS, 1);
                 }
             }
         }
@@ -702,20 +786,29 @@
     }
 
     // ---------- 交互 ----------
-    function pressDir(d) {
-        if (pressed.indexOf(d) < 0) pressed.push(d);
+    function addPressed(list, d) {
+        if (list.indexOf(d) < 0) list.push(d);
     }
 
-    function releaseDir(d) {
-        var i = pressed.indexOf(d);
-        if (i >= 0) pressed.splice(i, 1);
+    function removePressed(list, d) {
+        var i = list.indexOf(d);
+        if (i >= 0) list.splice(i, 1);
     }
 
-    function showOverlay(title, text, btn, fn) {
+    function showStart() {
+        state = 'ready';
+        startScreen.classList.remove('hidden');
+        resultScreen.classList.add('hidden');
+        overlay.classList.remove('hidden');
+    }
+
+    function showResult(title, text, btn, fn) {
         ovTitle.textContent = title;
         ovText.textContent = text;
         ovBtn.textContent = btn;
         ovBtn.onclick = fn;
+        startScreen.classList.add('hidden');
+        resultScreen.classList.remove('hidden');
         overlay.classList.remove('hidden');
     }
 
@@ -724,23 +817,36 @@
     }
 
     function bindKeyboard() {
-        var keyMap = {
-            ArrowLeft: 'left', a: 'left', A: 'left',
-            ArrowRight: 'right', d: 'right', D: 'right',
-            ArrowUp: 'up', w: 'up', W: 'up',
-            ArrowDown: 'down', s: 'down', S: 'down'
+        var p1keys = {
+            ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down'
+        };
+        var p2keys = {
+            a: 'left', A: 'left', d: 'right', D: 'right',
+            w: 'up', W: 'up', s: 'down', S: 'down'
         };
         window.addEventListener('keydown', function (e) {
-            if (keyMap[e.key]) {
-                e.preventDefault();
-                pressDir(keyMap[e.key]);
-            } else if (e.key === ' ' || e.key === 'j' || e.key === 'J') {
+            var k = e.key;
+            var handled = false;
+            if (p1keys[k]) { addPressed(pressed1, p1keys[k]); handled = true; }
+            if (p2keys[k]) {
+                if (mode === 'pvp') addPressed(pressed2, p2keys[k]);
+                else addPressed(pressed1, p2keys[k]);
+                handled = true;
+            }
+            if (handled) { e.preventDefault(); return; }
+
+            if (k === ' ' || k === 'Enter' || k === 'j' || k === 'J') {
                 e.preventDefault();
                 if (!e.repeat && state === 'playing') placeBomb(player);
+            } else if (mode === 'pvp' && (k === 'f' || k === 'F')) {
+                e.preventDefault();
+                if (!e.repeat && state === 'playing' && player2) placeBomb(player2);
             }
         });
         window.addEventListener('keyup', function (e) {
-            if (keyMap[e.key]) releaseDir(keyMap[e.key]);
+            var k = e.key;
+            if (p1keys[k]) removePressed(pressed1, p1keys[k]);
+            if (p2keys[k]) { removePressed(pressed1, p2keys[k]); removePressed(pressed2, p2keys[k]); }
         });
     }
 
@@ -748,8 +854,8 @@
         var btns = document.querySelectorAll('.dbtn');
         Array.prototype.forEach.call(btns, function (btn) {
             var dir = btn.getAttribute('data-dir');
-            function down(e) { e.preventDefault(); pressDir(dir); }
-            function up() { releaseDir(dir); }
+            function down(e) { e.preventDefault(); addPressed(pressed1, dir); }
+            function up() { removePressed(pressed1, dir); }
             btn.addEventListener('pointerdown', down);
             btn.addEventListener('pointerup', up);
             btn.addEventListener('pointerleave', up);
@@ -762,6 +868,26 @@
             if (state === 'playing') placeBomb(player);
         });
         bombBtn.addEventListener('touchstart', function (e) { e.preventDefault(); }, { passive: false });
+    }
+
+    function bindStartScreen() {
+        diffSeg.addEventListener('click', function (e) {
+            var btn = e.target;
+            if (!btn || !btn.getAttribute || !btn.getAttribute('data-diff')) return;
+            difficulty = btn.getAttribute('data-diff');
+            var all = diffSeg.querySelectorAll('.seg-btn');
+            Array.prototype.forEach.call(all, function (b) { b.classList.remove('active'); });
+            btn.classList.add('active');
+        });
+        var modeBtns = document.querySelectorAll('[data-mode]');
+        Array.prototype.forEach.call(modeBtns, function (btn) {
+            btn.addEventListener('click', function () {
+                mode = btn.getAttribute('data-mode');
+                wins = 0;
+                getAudio();
+                reset();
+            });
+        });
     }
 
     function layout() {
@@ -785,13 +911,10 @@
     document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
 
     generateMap();
-    player = makeEntity(1, 1, '#4ade80', false);
+    player = makeEntity(spawnPoints()[0].x, spawnPoints()[0].y, '#4ade80', false);
     entities = [player];
+    bindStartScreen();
     layout();
     requestAnimationFrame(loop);
-
-    ovBtn.onclick = function () {
-        getAudio();
-        reset();
-    };
+    showStart();
 })();

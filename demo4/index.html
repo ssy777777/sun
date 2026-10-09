@@ -19,9 +19,26 @@
         <main class="board-wrap">
             <canvas id="game" width="600" height="520"></canvas>
             <div id="overlay" class="overlay">
-                <h2 id="ov-title">泡泡堂</h2>
-                <p id="ov-text">放下水泡炸开箱子，别被炸到</p>
-                <button id="ov-btn" class="btn primary" type="button">开始游戏</button>
+                <div id="start-screen" class="start-screen">
+                    <h2>泡泡堂</h2>
+                    <p class="sub">放水泡炸开箱子，先炸到对方者胜</p>
+                    <div class="seg" id="diff-seg">
+                        <button class="seg-btn" data-diff="easy" type="button">简单</button>
+                        <button class="seg-btn active" data-diff="hard" type="button">困难</button>
+                        <button class="seg-btn" data-diff="nightmare" type="button">恶梦</button>
+                    </div>
+                    <p class="seg-label">难度（人机模式生效）</p>
+                    <div class="modes">
+                        <button class="btn primary" data-mode="ai" type="button">人机对战</button>
+                        <button class="btn" data-mode="pvp" type="button">双人对战</button>
+                    </div>
+                    <p class="keys">双人：玩家1 方向键 + 空格　玩家2 WASD + F</p>
+                </div>
+                <div id="result-screen" class="result-screen hidden">
+                    <h2 id="ov-title"></h2>
+                    <p id="ov-text"></p>
+                    <button id="ov-btn" class="btn primary" type="button"></button>
+                </div>
             </div>
         </main>
 
@@ -35,7 +52,7 @@
             <button id="bomb-btn" class="bomb-btn" type="button">水泡</button>
         </footer>
 
-        <p class="hint">电脑：方向键 / WASD 移动　空格 放水泡</p>
+        <p class="hint">人机：方向键 / WASD 移动，空格 放水泡　双人：玩家1 方向键+空格，玩家2 WASD+F</p>
     </div>
 
     <script src="./js/bnb.js"></script>

@@ -3,11 +3,39 @@
 
     var DIFF = {
         easy: { total: 30, layers: 4, palette: 6 },
-        mid: { total: 45, layers: 5, palette: 8 },
-        hard: { total: 60, layers: 6, palette: 10 }
+        mid: { total: 45, layers: 5, palette: 9 },
+        hard: { total: 60, layers: 6, palette: 12 }
     };
-    var COLORS = ['#ef5350', '#ffa726', '#ffca28', '#66bb6a', '#26c6da', '#42a5f5', '#7e57c2', '#ec407a', '#8d6e63', '#26a69a'];
-    var LETTERS = 'ABCDEFGHIJ';
+
+    // 12 生肖 Q版小动物（内联 SVG，viewBox 100x100）
+    var ANIMALS = [
+        // 鼠
+        '<svg viewBox="0 0 100 100"><circle cx="26" cy="26" r="15" fill="#b9bec9"/><circle cx="74" cy="26" r="15" fill="#b9bec9"/><circle cx="26" cy="26" r="8" fill="#f2b8c6"/><circle cx="74" cy="26" r="8" fill="#f2b8c6"/><ellipse cx="50" cy="56" rx="30" ry="28" fill="#c9cdd6"/><circle cx="40" cy="52" r="4" fill="#33323f"/><circle cx="60" cy="52" r="4" fill="#33323f"/><circle cx="50" cy="64" r="5" fill="#f2a8b8"/><path d="M30 60q-8 2-10 8M70 60q8 2 10 8" stroke="#9aa0ab" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+        // 牛
+        '<svg viewBox="0 0 100 100"><path d="M20 30q-10-14 2-18 6 8 10 16Z" fill="#efe3d2"/><path d="M80 30q10-14-2-18-6 8-10 16Z" fill="#efe3d2"/><ellipse cx="50" cy="58" rx="32" ry="28" fill="#c58a5a"/><ellipse cx="50" cy="66" rx="16" ry="12" fill="#e6b98f"/><circle cx="38" cy="52" r="4" fill="#33323f"/><circle cx="62" cy="52" r="4" fill="#33323f"/><circle cx="44" cy="66" r="2.5" fill="#8a5a34"/><circle cx="56" cy="66" r="2.5" fill="#8a5a34"/></svg>',
+        // 虎
+        '<svg viewBox="0 0 100 100"><circle cx="26" cy="28" r="13" fill="#f0a63c"/><circle cx="74" cy="28" r="13" fill="#f0a63c"/><circle cx="26" cy="28" r="6" fill="#f7d3a0"/><circle cx="74" cy="28" r="6" fill="#f7d3a0"/><ellipse cx="50" cy="58" rx="31" ry="28" fill="#f5b552"/><path d="M40 34v8M50 32v9M60 34v8" stroke="#5a3b16" stroke-width="3" stroke-linecap="round"/><circle cx="39" cy="56" r="4" fill="#33323f"/><circle cx="61" cy="56" r="4" fill="#33323f"/><path d="M46 66q4 4 8 0" stroke="#5a3b16" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="44" cy="64" r="4" fill="#f3a0a0" opacity=".7"/><circle cx="56" cy="64" r="4" fill="#f3a0a0" opacity=".7"/></svg>',
+        // 兔
+        '<svg viewBox="0 0 100 100"><ellipse cx="38" cy="24" rx="9" ry="20" fill="#f4f4f7"/><ellipse cx="38" cy="24" rx="4.5" ry="13" fill="#f2b8c6"/><ellipse cx="62" cy="24" rx="9" ry="20" fill="#f4f4f7"/><ellipse cx="62" cy="24" rx="4.5" ry="13" fill="#f2b8c6"/><ellipse cx="50" cy="62" rx="30" ry="28" fill="#ffffff"/><circle cx="40" cy="58" r="4" fill="#33323f"/><circle cx="60" cy="58" r="4" fill="#33323f"/><circle cx="50" cy="68" r="4" fill="#f2a8b8"/><path d="M46 72q4 4 8 0" stroke="#c98aa0" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+        // 龙
+        '<svg viewBox="0 0 100 100"><path d="M26 26l6-16 8 12Z" fill="#e8c86a"/><path d="M74 26l-6-16-8 12Z" fill="#e8c86a"/><ellipse cx="50" cy="58" rx="31" ry="28" fill="#5fbf6a"/><circle cx="39" cy="54" r="4.5" fill="#22331f"/><circle cx="61" cy="54" r="4.5" fill="#22331f"/><ellipse cx="50" cy="66" rx="14" ry="8" fill="#8fe08f"/><circle cx="45" cy="66" r="2.5" fill="#2f6b34"/><circle cx="55" cy="66" r="2.5" fill="#2f6b34"/><path d="M40 32v6M50 30v8M60 32v6" stroke="#2f8a3e" stroke-width="2.5" stroke-linecap="round"/></svg>',
+        // 蛇
+        '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="32" ry="30" fill="#7bd08a"/><circle cx="38" cy="48" r="4.5" fill="#22331f"/><circle cx="62" cy="48" r="4.5" fill="#22331f"/><path d="M50 64v8M50 72l-6 6M50 72l6 6" stroke="#e5566a" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="34" cy="60" r="3" fill="#4fa85f"/><circle cx="66" cy="60" r="3" fill="#4fa85f"/></svg>',
+        // 马
+        '<svg viewBox="0 0 100 100"><path d="M34 24l-6-14 14 6Z" fill="#c98a4b"/><path d="M66 24l6-14-14 6Z" fill="#c98a4b"/><ellipse cx="50" cy="56" rx="29" ry="29" fill="#d9a06b"/><path d="M50 28q10 0 12 14-12-6-24 0Q40 28 50 28Z" fill="#7a4f2a"/><circle cx="40" cy="56" r="4" fill="#33323f"/><circle cx="60" cy="56" r="4" fill="#33323f"/><ellipse cx="50" cy="70" rx="12" ry="9" fill="#c98a4b"/><circle cx="45" cy="70" r="2.5" fill="#5a3b20"/><circle cx="55" cy="70" r="2.5" fill="#5a3b20"/></svg>',
+        // 羊
+        '<svg viewBox="0 0 100 100"><circle cx="30" cy="30" r="12" fill="#fbf8f0"/><circle cx="70" cy="30" r="12" fill="#fbf8f0"/><circle cx="42" cy="24" r="11" fill="#fbf8f0"/><circle cx="58" cy="24" r="11" fill="#fbf8f0"/><ellipse cx="50" cy="60" rx="30" ry="27" fill="#f2ede0"/><path d="M28 40q-6-8 2-12M72 40q6-8-2-12" stroke="#d9c9a8" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="40" cy="58" r="4" fill="#4a4638"/><circle cx="60" cy="58" r="4" fill="#4a4638"/><circle cx="50" cy="68" r="4" fill="#d9b0a0"/></svg>',
+        // 猴
+        '<svg viewBox="0 0 100 100"><circle cx="22" cy="50" r="12" fill="#a9713f"/><circle cx="78" cy="50" r="12" fill="#a9713f"/><ellipse cx="50" cy="56" rx="30" ry="29" fill="#b97f4a"/><ellipse cx="50" cy="60" rx="20" ry="19" fill="#e6c19a"/><circle cx="41" cy="54" r="4" fill="#33323f"/><circle cx="59" cy="54" r="4" fill="#33323f"/><circle cx="46" cy="66" r="2" fill="#7a4f2a"/><circle cx="54" cy="66" r="2" fill="#7a4f2a"/><path d="M44 70q6 4 12 0" stroke="#7a4f2a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+        // 鸡
+        '<svg viewBox="0 0 100 100"><path d="M36 20q4-12 10-6 4-10 8 0 6-6 10 6Z" fill="#e5566a"/><ellipse cx="50" cy="58" rx="30" ry="28" fill="#f0c94a"/><circle cx="40" cy="54" r="4" fill="#33323f"/><circle cx="60" cy="54" r="4" fill="#33323f"/><path d="M50 62l-8 8 16 0Z" fill="#f0913a"/><circle cx="44" cy="64" r="3" fill="#e5566a" opacity=".5"/><circle cx="56" cy="64" r="3" fill="#e5566a" opacity=".5"/></svg>',
+        // 狗
+        '<svg viewBox="0 0 100 100"><ellipse cx="22" cy="46" rx="12" ry="20" fill="#a9713f"/><ellipse cx="78" cy="46" rx="12" ry="20" fill="#a9713f"/><ellipse cx="50" cy="58" rx="30" ry="28" fill="#d29a5c"/><circle cx="40" cy="54" r="4" fill="#33323f"/><circle cx="60" cy="54" r="4" fill="#33323f"/><ellipse cx="50" cy="68" rx="12" ry="9" fill="#f0e2d0"/><ellipse cx="50" cy="63" rx="5" ry="4" fill="#33323f"/><path d="M50 67v6M50 73q-5 4-9 1M50 73q5 4 9 1" stroke="#33323f" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+        // 猪
+        '<svg viewBox="0 0 100 100"><path d="M26 30l-4-16 16 8Z" fill="#f2a0b4"/><path d="M74 30l4-16-16 8Z" fill="#f2a0b4"/><ellipse cx="50" cy="58" rx="31" ry="28" fill="#f7b8c6"/><circle cx="39" cy="52" r="4" fill="#33323f"/><circle cx="61" cy="52" r="4" fill="#33323f"/><ellipse cx="50" cy="68" rx="13" ry="10" fill="#f497ac"/><circle cx="45" cy="68" r="2.5" fill="#b3607a"/><circle cx="55" cy="68" r="2.5" fill="#b3607a"/></svg>'
+    ];
+    var COLORS = ['#ef5350', '#ffa726', '#ffca28', '#66bb6a', '#26c6da', '#42a5f5', '#7e57c2', '#ec407a', '#8d6e63', '#26a69a', '#9ccc65', '#ab47bc'];
+
     var SLOT_MAX = 7;
 
     var boardEl = document.getElementById('board');
@@ -25,12 +53,21 @@
     var diff = 'mid';
     var tiles = [];
     var bar = [];
+    var slotCells = [];
+    var inflight = 0;
     var cleared = 0;
     var over = false;
     var TS = 56;
     var LAST_ORDER = [];
 
     function randInt(n) { return Math.floor(Math.random() * n); }
+
+    function tint(type) {
+        var hex = COLORS[type].replace('#', '');
+        var r = parseInt(hex.substr(0, 2), 16), g = parseInt(hex.substr(2, 2), 16), b = parseInt(hex.substr(4, 2), 16);
+        function mix(c) { return Math.round(c + (255 - c) * 0.74); }
+        return 'rgb(' + mix(r) + ',' + mix(g) + ',' + mix(b) + ')';
+    }
 
     function distribute(total, layers) {
         var w = [], sum = 0, l;
@@ -53,10 +90,6 @@
             if (o.layer > tile.layer && overlap(o, tile)) return true;
         }
         return false;
-    }
-
-    function freeTiles() {
-        return tiles.filter(function (t) { return !t.removed && !isCovered(t); });
     }
 
     function generate() {
@@ -88,14 +121,9 @@
             }
         }
 
-        // 保证总数是 3 的倍数（从最上层裁掉多余）
-        while (tiles.length % 3 !== 0 && tiles.length) {
-            var top = tiles[tiles.length - 1];
-            tiles.splice(tiles.length - 1, 1);
-            void top;
-        }
+        while (tiles.length % 3 !== 0 && tiles.length) tiles.pop();
 
-        // 求一个合法的“依次点出”顺序（每次取一个当前可点的）
+        // 合法的“依次点出”顺序
         var order = [];
         var remain = tiles.slice();
         while (remain.length) {
@@ -115,7 +143,6 @@
             remain.splice(pick, 1);
         }
 
-        // 沿该顺序每 3 个赋同一种类型 → 按顺序点必然可消除
         for (var k = 0; k < order.length; k++) {
             order[k].type = Math.floor(k / 3) % cfg.palette;
         }
@@ -132,10 +159,10 @@
             el.style.width = TS + 'px';
             el.style.height = TS + 'px';
             el.style.transform = 'translate(' + t.x + 'px,' + t.y + 'px)';
-            el.style.background = COLORS[t.type];
-            el.style.fontSize = Math.round(TS * 0.5) + 'px';
-            el.textContent = LETTERS[t.type];
+            el.style.background = tint(t.type);
+            el.style.borderColor = COLORS[t.type];
             el.style.zIndex = String(t.layer * 1000 + i);
+            el.innerHTML = ANIMALS[t.type];
             (function (tile, node) {
                 node.addEventListener('pointerdown', function (e) {
                     e.preventDefault();
@@ -157,19 +184,20 @@
         }
     }
 
-    function renderSlots(popIndex) {
+    function renderSlots() {
         slotEl.textContent = '';
+        slotCells = [];
         for (var i = 0; i < SLOT_MAX; i++) {
             var c = document.createElement('div');
             c.className = 'slot-cell';
             if (i < bar.length) {
                 c.classList.add('filled');
-                c.style.background = COLORS[bar[i]];
-                c.style.borderColor = 'rgba(255,255,255,0.75)';
-                c.textContent = LETTERS[bar[i]];
-                if (popIndex === i) c.classList.add('pop');
+                c.style.background = tint(bar[i]);
+                c.style.borderColor = COLORS[bar[i]];
+                c.innerHTML = ANIMALS[bar[i]];
             }
             slotEl.appendChild(c);
+            slotCells.push(c);
         }
     }
 
@@ -189,32 +217,76 @@
         if (over || tile.removed) return;
         if (isCovered(tile)) return;
         tile.removed = true;
-        if (tile.el) {
-            tile.el.classList.add('taken');
-            (function (el) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 200); })(tile.el);
-        }
+        startFlight(tile);
         updateCovered();
-        addToBar(tile.type);
+    }
+
+    function startFlight(tile) {
+        var el = tile.el;
+        var from = el.getBoundingClientRect();
+        el.style.visibility = 'hidden';
+
+        var idx = Math.min(bar.length + inflight, SLOT_MAX - 1);
+        var cell = slotCells[idx];
+        var to = cell ? cell.getBoundingClientRect() : from;
+        inflight++;
+
+        var clone = document.createElement('div');
+        clone.className = 'fly';
+        clone.style.left = from.left + 'px';
+        clone.style.top = from.top + 'px';
+        clone.style.width = from.width + 'px';
+        clone.style.height = from.height + 'px';
+        clone.style.background = tint(tile.type);
+        clone.style.borderColor = COLORS[tile.type];
+        clone.innerHTML = ANIMALS[tile.type];
+        document.body.appendChild(clone);
+
+        requestAnimationFrame(function () {
+            var dx = (to.left - from.left) + (to.width - from.width) / 2;
+            var dy = (to.top - from.top) + (to.height - from.height) / 2;
+            var sc = from.width ? (to.width * 0.92) / from.width : 0.6;
+            clone.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + sc + ')';
+            clone.style.opacity = '0.9';
+        });
+
+        setTimeout(function () {
+            if (clone.parentNode) clone.parentNode.removeChild(clone);
+            if (el.parentNode) el.parentNode.removeChild(el);
+            inflight--;
+            addToBar(tile.type);
+        }, 300);
     }
 
     function addToBar(type) {
         bar.push(type);
-        var cnt = 0;
-        for (var i = 0; i < bar.length; i++) if (bar[i] === type) cnt++;
-        if (cnt >= 3) {
-            var removed = 0;
-            for (var j = bar.length - 1; j >= 0 && removed < 3; j--) {
-                if (bar[j] === type) { bar.splice(j, 1); removed++; }
+        renderSlots();
+
+        var idxs = [];
+        for (var i = 0; i < bar.length; i++) if (bar[i] === type) idxs.push(i);
+
+        if (idxs.length >= 3) {
+            var three = idxs.slice(0, 3);
+            for (var k = 0; k < three.length; k++) {
+                if (slotCells[three[k]]) slotCells[three[k]].classList.add('clearing');
             }
             cleared += 3;
-            renderSlots();
+            updateHud();
+            setTimeout(function () {
+                three.sort(function (a, b) { return b - a; }).forEach(function (i) { bar.splice(i, 1); });
+                renderSlots();
+                checkEnd();
+            }, 340);
         } else {
-            renderSlots(bar.length - 1);
+            updateHud();
+            checkEnd();
         }
-        updateHud();
+    }
 
-        if (bar.length >= SLOT_MAX) { gameOver(false); return; }
-        if (remaining() === 0 && bar.length === 0) { win(); }
+    function checkEnd() {
+        if (over) return;
+        if (bar.length >= SLOT_MAX) { gameOver(); return; }
+        if (remaining() === 0 && bar.length === 0) win();
     }
 
     function win() {
@@ -236,6 +308,7 @@
     function newGame() {
         over = false;
         bar = [];
+        inflight = 0;
         cleared = 0;
         overlay.classList.add('hidden');
         generate();

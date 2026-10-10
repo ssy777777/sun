@@ -301,28 +301,30 @@ body {
     gap: 10px;
 }
 
-/* 底部固定释义 / 历史记录 */
+/* 底部固定释义 / 历史记录（沿用弹窗样式，宽度与牌盘一致） */
 .console {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(58, 47, 34, 0.96);
+    left: 50%;
+    bottom: 12px;
+    transform: translateX(-50%);
+    width: min(94vw, 420px);
+    box-sizing: border-box;
+    background: rgba(58, 47, 34, 0.94);
     color: #fdf6e8;
-    border-top: 1px solid rgba(216, 201, 168, 0.4);
-    box-shadow: 0 -10px 24px -16px rgba(0, 0, 0, 0.7);
-    padding: 9px 14px;
+    border-radius: 12px;
+    padding: 10px 14px;
     font-size: 13px;
-    line-height: 1.55;
-    max-height: 52px;
-    overflow: hidden;
-    transition: max-height 0.25s ease;
+    line-height: 1.5;
+    box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.75);
     cursor: pointer;
     z-index: 30;
+    max-height: 44px;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
 }
 
 .console.open {
-    max-height: 58vh;
+    max-height: 55vh;
     overflow-y: auto;
 }
 
@@ -335,11 +337,19 @@ body {
 .console-now {
     flex: 1;
     min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .console-now b {
     color: #ffd76a;
     margin-right: 2px;
+}
+
+.console-now i {
+    font-style: normal;
+    color: #cbbfa4;
 }
 
 .console-toggle {
@@ -361,8 +371,9 @@ body {
 }
 
 .console-list .item {
-    padding: 5px 0;
+    padding: 6px 0;
     border-bottom: 1px dotted rgba(216, 201, 168, 0.2);
+    white-space: normal;
 }
 
 .console-list .item b {

@@ -336,7 +336,7 @@
                     consoleNow.appendChild(o);
                 }
             } else {
-                consoleNow.textContent = '消除词语后，这里会显示它的释义与出处';
+                consoleNow.textContent = '';
             }
         }
         if (consoleToggle) consoleToggle.textContent = '记录 ' + history.length + ' ▾';

@@ -88,6 +88,11 @@ var APPS = [
         desc: '判断当前刺激与 N 步前是否相同：方块位置 + 字母声音的双重 N-back，训练工作记忆。',
         icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><polyline points="3 4 3 9.5 8.5 9.5"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/></svg>'
     },
+    {
+        cat: '记忆力训练', title: '记忆宫殿', href: './demo17/', color: '#8b5cf6',
+        desc: '地点法训练：沿熟悉路线把词语放到各个地点（越离奇越好记），再按顺序回忆。可选「我的家 / 校园 / 公园」或自定义词语。',
+        icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/><circle cx="12" cy="9" r="1.4" fill="currentColor" stroke="none"/></svg>'
+    },
 
     // ---------- 益智 ----------
     {

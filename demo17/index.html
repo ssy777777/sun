@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#eef4fb">
+    <title>记忆宫殿</title>
+    <link rel="stylesheet" href="./css/palace.css">
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <h1>记忆宫殿</h1>
+            <div class="best">最佳 <b id="best">0</b> 站全对</div>
+        </header>
+
+        <section id="screen-setup" class="screen">
+            <div class="row">
+                <span class="label">选择宫殿</span>
+                <div class="chips" id="palace-chips"></div>
+            </div>
+            <div class="row">
+                <span class="label">地点数</span>
+                <div class="chips" id="count-chips"></div>
+            </div>
+            <div class="row">
+                <span class="label">自定义词语（可选，用空格 / 逗号 / 换行分隔）</span>
+                <textarea id="custom" placeholder="留空则随机出词，例如：苹果 钥匙 雨伞 小猫"></textarea>
+            </div>
+            <button id="start-btn" class="primary" type="button">开始记忆</button>
+            <p class="tip">方法：把每个词语想象成一幅夸张离奇的画面，放到对应地点上；走一遍路线就能按顺序记住。</p>
+        </section>
+
+        <section id="screen-memorize" class="screen hide">
+            <div class="bar">
+                <span id="memo-prog">1 / 5</span>
+                <button id="memo-quit" class="act" type="button">返回</button>
+            </div>
+            <div class="map" id="map-memo"></div>
+            <div class="card">
+                <div class="loc" id="memo-loc">门口</div>
+                <div class="word" id="memo-word">苹果</div>
+                <div class="assoc" id="memo-assoc"></div>
+            </div>
+            <div class="bar">
+                <button id="memo-prev" class="act" type="button">上一站</button>
+                <button id="memo-next" class="primary" type="button">下一站</button>
+            </div>
+        </section>
+
+        <section id="screen-recall" class="screen hide">
+            <div class="bar">
+                <span class="hintline">先点词语，再点地点放置（点已放置的地点可取回）</span>
+                <button id="recall-quit" class="act" type="button">返回</button>
+            </div>
+            <div class="map" id="map-recall"></div>
+            <div class="tray" id="tray"></div>
+            <div class="bar">
+                <button id="recall-reset" class="act" type="button">重置</button>
+                <button id="recall-submit" class="primary" type="button">提交</button>
+            </div>
+            <div class="feed" id="recall-feed"></div>
+        </section>
+
+        <section id="screen-result" class="screen hide">
+            <div class="stars" id="res-stars"></div>
+            <h2 id="res-title">完成</h2>
+            <p id="res-text"></p>
+            <div class="list" id="res-list"></div>
+            <div class="bar">
+                <button id="res-again" class="primary" type="button">再来一次</button>
+                <button id="res-setup" class="act" type="button">换宫殿</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="./js/palace.js"></script>
+</body>
+</html>

@@ -22,8 +22,6 @@
     var canvas = document.getElementById('stage');
     var ctx = canvas.getContext('2d');
     var hudLevel = document.getElementById('hud-level');
-    var hudBirds = document.getElementById('hud-birds');
-    var hudPigs = document.getElementById('hud-pigs');
     var hudScore = document.getElementById('hud-score');
     var tapHint = document.getElementById('tap-hint');
     var overlay = document.getElementById('overlay');
@@ -36,17 +34,22 @@
     var menuEl = document.getElementById('menu');
     var menuGrid = document.getElementById('menu-grid');
     var menuClose = document.getElementById('menu-close');
-    var menuBtn = document.getElementById('menu-btn');
-    var soundBtn = document.getElementById('sound');
-    var restartBtn = document.getElementById('restart');
+    var settingsBtn = document.getElementById('settings-btn');
+    var settingsEl = document.getElementById('settings');
+    var setResumeBtn = document.getElementById('set-resume');
+    var setMenuBtn = document.getElementById('set-menu');
+    var setSoundBtn = document.getElementById('set-sound');
+    var setRestartBtn = document.getElementById('set-restart');
 
     var dpr = 1, cw = 0, ch = 0, scale = 1, offX = 0, offY = 0;
     var world, blocks = [], pigs = [];
     var activeBirds = [], egg = null, particles = [], shocks = [];
-    var levelIndex = 0, birdQueue = [], birdIdx = 0, currentBird = null;
-    var score = 0, state = 'aiming';
+    var pending = [], totalBirds = 0, spawnedBirds = 0, currentBird = null;
+    var levelIndex = 0;
+    var score = 0, state = 'aiming', paused = false;
     var dragging = false, dragPos = V(SLING.x, SLING.y);
     var flyT = 0;
+    var PEND_SPACING = 42, ENTER_TIME = 0.42;
     var soundOn = true, audioCtx = null, lastT = 0;
     var prog = { unlocked: 1, stars: {} };
 
@@ -130,16 +133,20 @@
     }
 
     function spawnNextBird() {
-        if (birdIdx >= birdQueue.length) { currentBird = null; state = 'aiming'; updateHUD(); return; }
-        var type = birdQueue[birdIdx++];
-        var t = BIRD_TYPES[type];
-        var body = new Phys.Body({ shape: Phys.Circle(t.r), position: V(SLING.x, SLING.y), density: t.density, restitution: 0.25, friction: 0.5, static: true });
+        if (pending.length === 0) { currentBird = null; state = 'aiming'; updateHUD(); return; }
+        var item = pending.shift();
+        spawnedBirds++;
+        var type = item.type, t = BIRD_TYPES[type];
+        var body = new Phys.Body({ shape: Phys.Circle(t.r), position: V(item.x, item.y), density: t.density, restitution: 0.25, friction: 0.5, static: true });
         body.data = { kind: 'bird', type: type };
         world.add(body);
-        currentBird = { body: body, type: type, powerUsed: false, lowT: 0, done: false };
+        currentBird = {
+            body: body, type: type, powerUsed: false, lowT: 0, done: false,
+            enterT: 0, enterFrom: { x: item.x, y: item.y }, r: t.r
+        };
         activeBirds = [];
         dragPos = V(SLING.x, SLING.y);
-        state = 'aiming';
+        state = 'entering';
         updateHUD();
     }
 
@@ -291,18 +298,23 @@
     function updateHUD() {
         hudLevel.textContent = LEVELS[levelIndex].name;
         hudScore.textContent = score;
-        hudPigs.textContent = '×' + activePigs();
-        hudBirds.textContent = '';
-        var from = state === 'aiming' ? Math.max(0, birdIdx - 1) : birdIdx;
-        for (var i = from; i < birdQueue.length; i++) {
-            var dotEl = document.createElement('i');
-            dotEl.className = 'bdot';
-            dotEl.style.background = BIRD_TYPES[birdQueue[i]].color;
-            hudBirds.appendChild(dotEl);
-        }
     }
 
     function step(dt) {
+        if (paused) return;
+        if (state === 'entering') {
+            currentBird.enterT += dt;
+            var tt = Math.min(1, currentBird.enterT / ENTER_TIME);
+            var fx = currentBird.enterFrom.x, fy = currentBird.enterFrom.y;
+            var ex = fx + (SLING.x - fx) * tt;
+            var ey = fy + (SLING.y - fy) * tt - Math.sin(Math.PI * tt) * 70;
+            currentBird.body.position = V(ex, ey);
+            if (tt >= 1) { currentBird.body.position = V(SLING.x, SLING.y); state = 'aiming'; }
+        }
+        for (var q = 0; q < pending.length; q++) {
+            var target = SLING.x - (q + 1) * PEND_SPACING;
+            pending[q].x += (target - pending[q].x) * Math.min(1, dt * 9);
+        }
         if (state !== 'won' && state !== 'lost') {
             for (var i = 0; i < world.bodies.length; i++) {
                 var bb = world.bodies[i];
@@ -354,14 +366,14 @@
         activeBirds = [];
         if (egg) { if (world.bodies.indexOf(egg.body) >= 0) world.remove(egg.body); egg = null; }
         if (activePigs() === 0) { win(); return; }
-        if (birdIdx >= birdQueue.length) { lose(); return; }
+        if (pending.length === 0) { lose(); return; }
         spawnNextBird();
     }
 
     function win() {
         if (state === 'won' || state === 'lost') return;
         state = 'won';
-        var remaining = birdQueue.length - birdIdx;
+        var remaining = pending.length;
         var stars = starsFor(remaining);
         score += remaining * 500;
         updateHUD();
@@ -379,6 +391,7 @@
     }
 
     function showOverlay(title, stars, text, showNext) {
+        paused = true;
         ovTitle.textContent = title;
         var s = '';
         for (var i = 1; i <= 3; i++) s += '<span class="star' + (i <= stars ? ' on' : '') + '">★</span>';
@@ -392,10 +405,16 @@
         levelIndex = i;
         var spec = LEVELS[i];
         blocks = []; pigs = []; activeBirds = []; egg = null; particles = []; shocks = [];
-        score = 0; dragging = false; flyT = 0;
+        score = 0; dragging = false; flyT = 0; paused = false;
+        overlay.classList.add('hidden');
+        settingsEl.classList.add('hidden');
+        menuEl.classList.add('hidden');
         buildWorld(spec);
-        birdQueue = spec.birds.slice();
-        birdIdx = 0;
+        pending = spec.birds.map(function (type, k) {
+            return { type: type, x: SLING.x - (k + 1) * PEND_SPACING, y: GROUND_Y - BIRD_TYPES[type].r };
+        });
+        totalBirds = spec.birds.length;
+        spawnedBirds = 0;
         currentBird = null;
         state = 'aiming';
         spawnNextBird();
@@ -417,7 +436,7 @@
             })(i);
         }
     }
-    function showMenu() { buildMenu(); menuEl.classList.remove('hidden'); }
+    function showMenu() { paused = true; buildMenu(); menuEl.classList.remove('hidden'); }
     function hideMenu() { menuEl.classList.add('hidden'); }
 
     // ---- render ----
@@ -460,11 +479,13 @@
         for (var q = 0; q < pigs.length; q++) if (!pigs[q].dead) drawPig(pigs[q]);
         if (egg) drawEgg(egg.body.position);
 
+        pending.forEach(function (it) { drawBird(V(it.x, it.y), 0, it.type); });
         activeBirds.forEach(function (b) { if (!b.done) drawBird(b.body.position, b.body.angle, b.type); });
-        if (currentBird && state === 'aiming') {
-            var pos = dragging ? dragPos : V(SLING.x, SLING.y);
+        if (currentBird && (state === 'aiming' || state === 'entering')) {
+            var pos = state === 'entering' ? currentBird.body.position : (dragging ? dragPos : V(SLING.x, SLING.y));
             drawBird(pos, 0, currentBird.type);
         }
+        drawPigCounter();
 
         for (var s = 0; s < shocks.length; s++) {
             var sh = shocks[s];
@@ -513,6 +534,34 @@
         ctx.beginPath(); ctx.arc(0, 0, 10, 0, 7); ctx.fill(); ctx.stroke();
         ctx.restore();
     }
+    function roundRectPath(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+    }
+    function drawPigCounter() {
+        ctx.save();
+        var label = '× ' + activePigs();
+        ctx.font = 'bold 22px "Segoe UI","Microsoft YaHei",sans-serif';
+        var tw = ctx.measureText(label).width, pad = 12, iconR = 11;
+        var totalW = iconR * 2 + 8 + tw + pad * 2, bx = WORLD_W - 24 - totalW, by = 16, cy = by + 20;
+        ctx.fillStyle = 'rgba(255,255,255,0.82)';
+        ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.lineWidth = 1;
+        roundRectPath(bx, by, totalW, 40, 12); ctx.fill(); ctx.stroke();
+        var ix = bx + pad + iconR;
+        ctx.fillStyle = '#7ec850'; ctx.beginPath(); ctx.arc(ix, cy, iconR, 0, 7); ctx.fill();
+        ctx.strokeStyle = '#4f972c'; ctx.lineWidth = 2; ctx.stroke();
+        ctx.fillStyle = '#8fd35f'; ctx.beginPath(); ctx.arc(ix, cy + 2, 4.5, 0, 7); ctx.fill();
+        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(ix - 3.5, cy - 3, 3, 0, 7); ctx.arc(ix + 3.5, cy - 3, 3, 0, 7); ctx.fill();
+        ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(ix - 3, cy - 3, 1.4, 0, 7); ctx.arc(ix + 4, cy - 3, 1.4, 0, 7); ctx.fill();
+        ctx.fillStyle = '#21384f'; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+        ctx.fillText(label, bx + pad + iconR * 2 + 8, cy);
+        ctx.restore();
+    }
     function drawBird(pos, angle, type) {
         var t = BIRD_TYPES[type];
         ctx.save(); ctx.translate(pos.x, pos.y); ctx.rotate(angle);
@@ -552,6 +601,7 @@
         return add(V(SLING.x, SLING.y), d);
     }
     function onDown(e) {
+        if (paused) return;
         if (state === 'aiming' && currentBird) {
             var c = clientXY(e);
             var p = toWorld(c.x, c.y);
@@ -593,17 +643,25 @@
     window.addEventListener('mousemove', function (e) { if (Date.now() - lastTouchTs < 800) return; onMove(e); });
     window.addEventListener('mouseup', function (e) { if (Date.now() - lastTouchTs < 800) return; onUp(); });
     window.addEventListener('resize', resize);
-    restartBtn.addEventListener('click', function () { startLevel(levelIndex); });
+
+    function toggleSound() {
+        soundOn = !soundOn;
+        setSoundBtn.classList.toggle('active', soundOn);
+        setSoundBtn.textContent = soundOn ? '音效' : '静音';
+    }
+    function openSettings() { paused = true; settingsEl.classList.remove('hidden'); }
+    function closeSettings() { settingsEl.classList.add('hidden'); }
+
+    settingsBtn.addEventListener('click', openSettings);
+    setResumeBtn.addEventListener('click', function () { closeSettings(); paused = false; });
+    setMenuBtn.addEventListener('click', function () { closeSettings(); showMenu(); });
+    setSoundBtn.addEventListener('click', toggleSound);
+    setRestartBtn.addEventListener('click', function () { closeSettings(); startLevel(levelIndex); });
+
     ovRestart.addEventListener('click', function () { overlay.classList.add('hidden'); startLevel(levelIndex); });
     ovNext.addEventListener('click', function () { overlay.classList.add('hidden'); startLevel(Math.min(LEVELS.length - 1, levelIndex + 1)); });
     ovMenu.addEventListener('click', function () { overlay.classList.add('hidden'); showMenu(); });
-    menuBtn.addEventListener('click', showMenu);
-    menuClose.addEventListener('click', hideMenu);
-    soundBtn.addEventListener('click', function () {
-        soundOn = !soundOn;
-        soundBtn.classList.toggle('active', soundOn);
-        soundBtn.textContent = soundOn ? '音效' : '静音';
-    });
+    menuClose.addEventListener('click', function () { hideMenu(); paused = false; });
 
     try {
         loadProg();

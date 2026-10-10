@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#bfe4ff">
     <title>愤怒的小鸟</title>
-    <link rel="stylesheet" href="./css/bird.css?v=3">
+    <link rel="stylesheet" href="./css/bird.css?v=4">
 </head>
 <body>
     <div class="app">
@@ -14,20 +14,13 @@
             <div class="top-right">
                 <span class="lvl" id="hud-level">1-1</span>
                 <span class="score">得分 <b id="hud-score">0</b></span>
+                <button id="settings-btn" class="icon-btn" type="button">设置</button>
             </div>
         </header>
 
         <div class="stage-wrap">
             <canvas id="stage"></canvas>
             <div class="hint" id="tap-hint">飞行中点击屏幕释放技能</div>
-        </div>
-
-        <div class="foot">
-            <div class="birds" id="hud-birds"></div>
-            <span class="stat">猪 <b id="hud-pigs">×1</b></span>
-            <button id="menu-btn" class="act" type="button">选关</button>
-            <button id="sound" class="act active" type="button">音效</button>
-            <button id="restart" class="act" type="button">重开</button>
         </div>
 
         <div class="overlay hidden" id="overlay">
@@ -41,6 +34,16 @@
             </div>
         </div>
 
+        <div class="overlay hidden" id="settings">
+            <h2>暂停</h2>
+            <div class="ov-actions">
+                <button id="set-resume" class="primary" type="button">继续</button>
+                <button id="set-menu" class="act" type="button">选关</button>
+                <button id="set-sound" class="act active" type="button">音效</button>
+                <button id="set-restart" class="act" type="button">重开</button>
+            </div>
+        </div>
+
         <div class="overlay hidden" id="menu">
             <h2>选择关卡</h2>
             <div class="menu-grid" id="menu-grid"></div>
@@ -48,8 +51,8 @@
         </div>
     </div>
 
-    <script src="./js/physics.js?v=3"></script>
-    <script src="./js/levels.js?v=3"></script>
-    <script src="./js/game.js?v=3"></script>
+    <script src="./js/physics.js?v=4"></script>
+    <script src="./js/levels.js?v=4"></script>
+    <script src="./js/game.js?v=4"></script>
 </body>
 </html>

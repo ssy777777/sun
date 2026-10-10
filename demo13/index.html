@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#f3f7ef">
+    <title>羊了个羊</title>
+    <link rel="stylesheet" href="./css/sheep.css">
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <h1>羊了个羊</h1>
+            <div class="seg" id="diff-seg">
+                <button class="seg-btn" data-diff="easy" type="button">简单</button>
+                <button class="seg-btn active" data-diff="mid" type="button">中等</button>
+                <button class="seg-btn" data-diff="hard" type="button">困难</button>
+            </div>
+        </header>
+
+        <div class="hud">
+            <span>剩余 <b id="left">0</b></span>
+            <span>已消 <b id="cleared">0</b></span>
+            <span>槽位 <b id="slotn">0/7</b></span>
+        </div>
+
+        <div class="board" id="board"></div>
+
+        <div class="slot" id="slot"></div>
+
+        <button id="restart" class="act" type="button">重新开始</button>
+
+        <div class="overlay hidden" id="overlay">
+            <h2 id="ov-title"></h2>
+            <p id="ov-text"></p>
+            <button id="ov-btn" class="primary" type="button">再来一次</button>
+        </div>
+    </div>
+
+    <script src="./js/sheep.js"></script>
+</body>
+</html>

@@ -36,6 +36,11 @@ var APPS = [
         desc: '第一人称狙击暗杀：长按瞄准、松手开枪、爆头一击必杀，含爆炸连锁、枪械解锁与无尽模式。',
         icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3" fill="currentColor" stroke="none"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>'
     },
+    {
+        cat: '小游戏', title: '羊了个羊', href: './demo13/', color: '#2e7d32',
+        desc: '多层堆叠的消除玩法：点选顶层方块放进卡槽，集齐三个同类即可消除，槽满即败。',
+        icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="3" width="10" height="10" rx="2"/><rect x="9" y="8" width="10" height="10" rx="2"/><rect x="6" y="12" width="10" height="10" rx="2" opacity=".55"/></svg>'
+    },
 
     // ---------- 记忆力训练 ----------
     {

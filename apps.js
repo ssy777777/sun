@@ -5,6 +5,15 @@
 
 var CATEGORIES = ['小游戏', '记忆力训练', '益智', '基础练习'];
 
+/* 显示配置：
+ * groupByCategory: true = 按分类分组显示；false = 全部打散平铺在一起
+ * numbering: 'category' = 每个分类从 1 开始；'global' = 整体连续 1..N
+ * 想换回 1..13 那种整体编号：把 groupByCategory 设为 false，或 numbering 设为 'global'。 */
+var CONFIG = {
+    groupByCategory: true,
+    numbering: 'category'
+};
+
 var APPS = [
     // ---------- 小游戏 ----------
     {
@@ -91,6 +100,55 @@ var APPS = [
         return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')';
     }
 
+    function makeCard(it, num) {
+        var a = document.createElement('a');
+        a.className = 'card';
+        a.href = it.href;
+        a.style.setProperty('--c', it.color);
+        a.style.setProperty('--c-soft', hexToRgba(it.color, 0.18));
+
+        var badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = num;
+
+        var icon = document.createElement('span');
+        icon.className = 'icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.innerHTML = it.icon;
+
+        var h = document.createElement('h2');
+        h.textContent = it.title;
+
+        var p = document.createElement('p');
+        p.textContent = it.desc;
+
+        var go = document.createElement('span');
+        go.className = 'go';
+        go.innerHTML = '立即进入 <i>→</i>';
+
+        a.appendChild(badge);
+        a.appendChild(icon);
+        a.appendChild(h);
+        a.appendChild(p);
+        a.appendChild(go);
+        return a;
+    }
+
+    var counter = 0;
+
+    // 平铺模式：不分组，整体 1..N
+    if (!CONFIG.groupByCategory) {
+        var flat = document.createElement('div');
+        flat.className = 'cards';
+        APPS.forEach(function (it) {
+            counter++;
+            flat.appendChild(makeCard(it, counter));
+        });
+        root.appendChild(flat);
+        return;
+    }
+
+    // 分组模式
     CATEGORIES.forEach(function (cat) {
         var items = APPS.filter(function (x) { return x.cat === cat; });
         if (!items.length) return;
@@ -110,37 +168,9 @@ var APPS = [
         cards.className = 'cards';
 
         items.forEach(function (it, idx) {
-            var a = document.createElement('a');
-            a.className = 'card';
-            a.href = it.href;
-            a.style.setProperty('--c', it.color);
-            a.style.setProperty('--c-soft', hexToRgba(it.color, 0.18));
-
-            var badge = document.createElement('span');
-            badge.className = 'badge';
-            badge.textContent = idx + 1; // 分类内自动编号，从 1 开始
-
-            var icon = document.createElement('span');
-            icon.className = 'icon';
-            icon.setAttribute('aria-hidden', 'true');
-            icon.innerHTML = it.icon;
-
-            var h = document.createElement('h2');
-            h.textContent = it.title;
-
-            var p = document.createElement('p');
-            p.textContent = it.desc;
-
-            var go = document.createElement('span');
-            go.className = 'go';
-            go.innerHTML = '立即进入 <i>→</i>';
-
-            a.appendChild(badge);
-            a.appendChild(icon);
-            a.appendChild(h);
-            a.appendChild(p);
-            a.appendChild(go);
-            cards.appendChild(a);
+            counter++;
+            var num = CONFIG.numbering === 'global' ? counter : idx + 1;
+            cards.appendChild(makeCard(it, num));
         });
 
         section.appendChild(title);

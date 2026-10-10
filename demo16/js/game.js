@@ -310,6 +310,18 @@
             }
             world.step(dt);
             applyDamage();
+            for (var pi = pigs.length - 1; pi >= 0; pi--) {
+                var pg = pigs[pi];
+                if (pg.dead) continue;
+                var pp = pg.body.position;
+                if (pp.x < -100 || pp.x > WORLD_W + 100 || pp.y > WORLD_H + 160 || pp.y < -600) destroyPig(pg);
+            }
+            for (var bi = blocks.length - 1; bi >= 0; bi--) {
+                var bk = blocks[bi];
+                if (bk.dead) continue;
+                var bp = bk.body.position;
+                if (bp.x < -300 || bp.x > WORLD_W + 300 || bp.y > WORLD_H + 300 || bp.y < -600) { bk.dead = true; world.remove(bk.body); }
+            }
             if (egg) {
                 var hit = false;
                 for (var c = 0; c < world.contacts.length; c++) { if (world.contacts[c].a === egg.body || world.contacts[c].b === egg.body) { hit = true; break; } }

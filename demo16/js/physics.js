@@ -291,6 +291,7 @@
         this.bodies = [];
         this.iterations = opt.iterations || 8;
         this.contacts = [];
+        this.damping = opt.damping !== undefined ? opt.damping : 0.3;
     }
     World.prototype.add = function (body) { this.bodies.push(body); return body; };
     World.prototype.remove = function (body) {
@@ -309,11 +310,14 @@
         }
         this.contacts = manifolds;
 
+        var damp = Math.max(0, 1 - this.damping * dt);
         for (i = 0; i < this.bodies.length; i++) {
             b = this.bodies[i];
             if (b.staticBody) continue;
             b.velocity = add(b.velocity, mul(add(this.gravity, mul(b.force, b.invMass)), dt));
             b.angularVelocity += b.invInertia * b.torque * dt;
+            b.velocity = mul(b.velocity, damp);
+            b.angularVelocity *= damp;
         }
 
         for (var it = 0; it < this.iterations; it++) {

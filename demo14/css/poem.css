@@ -24,9 +24,9 @@ body {
     color: var(--ink);
     min-height: 100dvh;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 12px;
+    padding: 12px 12px 70px;
     background:
         radial-gradient(circle at 30% 8%, #fffaf0 0%, var(--bg) 60%, #e7dcc4 100%);
     -webkit-tap-highlight-color: transparent;
@@ -301,34 +301,79 @@ body {
     gap: 10px;
 }
 
-/* 消除时显示释义 */
-.toast {
+/* 底部固定释义 / 历史记录 */
+.console {
     position: fixed;
-    left: 50%;
-    bottom: 18px;
-    transform: translate(-50%, 12px);
-    max-width: min(90vw, 420px);
-    padding: 10px 16px;
-    border-radius: 12px;
-    background: rgba(58, 47, 34, 0.94);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(58, 47, 34, 0.96);
     color: #fdf6e8;
-    font-size: 14px;
-    line-height: 1.5;
-    text-align: center;
-    box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.7);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    z-index: 20;
+    border-top: 1px solid rgba(216, 201, 168, 0.4);
+    box-shadow: 0 -10px 24px -16px rgba(0, 0, 0, 0.7);
+    padding: 9px 14px;
+    font-size: 13px;
+    line-height: 1.55;
+    max-height: 52px;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+    cursor: pointer;
+    z-index: 30;
 }
 
-.toast.show {
-    opacity: 1;
-    transform: translate(-50%, 0);
+.console.open {
+    max-height: 58vh;
+    overflow-y: auto;
 }
 
-.toast b {
+.console-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.console-now {
+    flex: 1;
+    min-width: 0;
+}
+
+.console-now b {
     color: #ffd76a;
+    margin-right: 2px;
+}
+
+.console-toggle {
+    flex-shrink: 0;
+    font-size: 12px;
+    color: #d8c9a8;
+    white-space: nowrap;
+}
+
+.console-list {
+    display: none;
+    margin-top: 8px;
+    border-top: 1px dashed rgba(216, 201, 168, 0.35);
+    padding-top: 6px;
+}
+
+.console.open .console-list {
+    display: block;
+}
+
+.console-list .item {
+    padding: 5px 0;
+    border-bottom: 1px dotted rgba(216, 201, 168, 0.2);
+}
+
+.console-list .item b {
+    color: #ffd76a;
+}
+
+.console-list .item i {
+    display: block;
+    font-style: normal;
+    font-size: 12px;
+    color: #cbbfa4;
 }
 
 .act {

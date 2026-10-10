@@ -32,11 +32,14 @@
     var ovTitle = document.getElementById('ov-title');
     var ovText = document.getElementById('ov-text');
     var ovActions = document.getElementById('ov-actions');
-    var toastEl = document.getElementById('toast');
+    var consoleEl = document.getElementById('console');
+    var consoleNow = document.getElementById('console-now');
+    var consoleToggle = document.getElementById('console-toggle');
+    var consoleList = document.getElementById('console-list');
 
     var WORDS = window.WORDS || [];
     var WORD_SET = window.WORD_SET || {};
-    var MEANINGS = window.MEANINGS || {};
+    var DICT = window.DICT || {};
 
     var level = 1;
     var tiles = [];
@@ -54,7 +57,7 @@
     var TS = 56;
     var idle = 0;
     var hintTimer = null;
-    var toastTimer = null;
+    var history = [];
 
     function randInt(n) { return Math.floor(Math.random() * n); }
     function rankFor(lv) { return RANKS[Math.min(lv - 1, RANKS.length - 1)]; }
@@ -314,15 +317,47 @@
     }
 
     function showMeaning(word) {
-        var m = MEANINGS[word] || '';
-        toastEl.textContent = '';
-        var b = document.createElement('b');
-        b.textContent = word;
-        toastEl.appendChild(b);
-        if (m) toastEl.appendChild(document.createTextNode('：' + m));
-        toastEl.classList.add('show');
-        clearTimeout(toastTimer);
-        toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2400);
+        var e = DICT[word] || { m: '', o: '' };
+        history.push({ word: word, m: e.m, o: e.o });
+        renderConsole(word, e);
+    }
+
+    function renderConsole(word, e) {
+        if (consoleNow) {
+            consoleNow.textContent = '';
+            if (word) {
+                var b = document.createElement('b');
+                b.textContent = word;
+                consoleNow.appendChild(b);
+                consoleNow.appendChild(document.createTextNode('：' + (e.m || '')));
+                if (e.o) {
+                    var o = document.createElement('i');
+                    o.textContent = '　出处：' + e.o;
+                    consoleNow.appendChild(o);
+                }
+            } else {
+                consoleNow.textContent = '消除词语后，这里会显示它的释义与出处';
+            }
+        }
+        if (consoleToggle) consoleToggle.textContent = '记录 ' + history.length + ' ▾';
+        if (consoleList) {
+            consoleList.textContent = '';
+            for (var i = history.length - 1; i >= 0; i--) {
+                var it = history[i];
+                var d = document.createElement('div');
+                d.className = 'item';
+                var wb = document.createElement('b');
+                wb.textContent = it.word;
+                d.appendChild(wb);
+                d.appendChild(document.createTextNode('：' + (it.m || '')));
+                if (it.o) {
+                    var oi = document.createElement('i');
+                    oi.textContent = '出处：' + it.o;
+                    d.appendChild(oi);
+                }
+                consoleList.appendChild(d);
+            }
+        }
     }
 
     function onAction() { resetIdle(); }
@@ -613,7 +648,9 @@
         eraseUses = ERASE_USES;
         pickingErase = false;
         resetIdle();
-        if (toastEl) toastEl.classList.remove('show');
+        history = [];
+        if (consoleEl) consoleEl.classList.remove('open');
+        renderConsole('', null);
         overlay.classList.add('hidden');
         generate();
         renderTiles();
@@ -633,6 +670,7 @@
     if (propOutBtn) propOutBtn.addEventListener('click', propOut);
     if (propShuffleBtn) propShuffleBtn.addEventListener('click', propShuffle);
     if (propEraseBtn) propEraseBtn.addEventListener('click', propErase);
+    if (consoleEl) consoleEl.addEventListener('click', function () { consoleEl.classList.toggle('open'); });
 
     setInterval(tickIdle, 1000);
 

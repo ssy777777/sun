@@ -11,7 +11,7 @@ var CATEGORIES = ['小游戏', '记忆力训练', '益智', '基础练习'];
  * 想换回 1..13 那种整体编号：把 groupByCategory 设为 false，或 numbering 设为 'global'。 */
 var CONFIG = {
     groupByCategory: true,
-    numbering: 'category'
+    numbering: 'global'
 };
 
 var APPS = [

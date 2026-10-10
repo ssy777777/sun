@@ -54,7 +54,7 @@
 
     var COUNT_OPTIONS = [5, 8, 12];
 
-    var palaceIndex = 0, count = 5, items = [], place = [], marks = [], memoIndex = 0, selected = null;
+    var palaceIndex = 0, count = 5, items = [], trayItems = [], place = [], marks = [], memoIndex = 0, selected = null;
 
     var bestEl = document.getElementById('best');
     var setupScreen = document.getElementById('screen-setup');
@@ -158,6 +158,7 @@
 
     // ---- recall ----
     function startRecall() {
+        trayItems = shuffle(items);
         place = new Array(items.length).fill(null);
         marks = [];
         selected = null;
@@ -174,7 +175,7 @@
         trayEl.textContent = '';
         var placed = {};
         place.forEach(function (v) { if (v) placed[v] = 1; });
-        var remaining = items.filter(function (w) { return !placed[w]; });
+        var remaining = trayItems.filter(function (w) { return !placed[w]; });
         remaining.forEach(function (w) {
             var c = document.createElement('div');
             c.className = 'tchip' + (selected === w ? ' sel' : '');

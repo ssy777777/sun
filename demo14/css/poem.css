@@ -141,8 +141,9 @@ body {
     z-index: 99999 !important;
 }
 
+/* 按下反馈只用亮度，不使用 transform，避免覆盖棋子的定位 */
 .tile:not(.covered):active {
-    transform: scale(0.93);
+    filter: brightness(0.9);
 }
 
 /* 移出暂存区（卡槽上方） */

@@ -92,6 +92,25 @@ body {
     touch-action: manipulation;
 }
 
+/* 小盘（关卡词数较多时） */
+.sub-boards {
+    display: flex;
+    gap: 10px;
+    width: min(94vw, 420px);
+}
+
+.sub-boards:empty {
+    display: none;
+}
+
+.board.small {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    aspect-ratio: 1 / 1;
+    height: auto;
+}
+
 .tile {
     position: absolute;
     display: flex;
@@ -112,6 +131,16 @@ body {
 .tile.covered {
     filter: brightness(0.82) saturate(0.7);
     cursor: default;
+}
+
+.tile.hint {
+    animation: hintPulse 0.8s ease-in-out infinite;
+    z-index: 99999 !important;
+}
+
+@keyframes hintPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(178, 58, 46, 0); transform: scale(1); }
+    50% { box-shadow: 0 0 0 4px rgba(178, 58, 46, 0.55); transform: scale(1.06); }
 }
 
 .tile:not(.covered):active {
@@ -270,6 +299,36 @@ body {
 .foot {
     display: flex;
     gap: 10px;
+}
+
+/* 消除时显示释义 */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    transform: translate(-50%, 12px);
+    max-width: min(90vw, 420px);
+    padding: 10px 16px;
+    border-radius: 12px;
+    background: rgba(58, 47, 34, 0.94);
+    color: #fdf6e8;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+    box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 20;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.toast b {
+    color: #ffd76a;
 }
 
 .act {

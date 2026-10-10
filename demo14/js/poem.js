@@ -1,16 +1,6 @@
 (function () {
     'use strict';
 
-    // 成语/词语拆成两份（每份 2 字，全局不重复，配对唯一）
-    var IDIOMS = [
-        ['画蛇', '添足'], ['守株', '待兔'], ['亡羊', '补牢'], ['掩耳', '盗铃'],
-        ['塞翁', '失马'], ['对牛', '弹琴'], ['狐假', '虎威'], ['杯弓', '蛇影'],
-        ['刻舟', '求剑'], ['井底', '之蛙'], ['叶公', '好龙'], ['滥竽', '充数'],
-        ['望梅', '止渴'], ['破釜', '沉舟'], ['卧薪', '尝胆'], ['纸上', '谈兵'],
-        ['惊弓', '之鸟'], ['完璧', '归赵'], ['负荆', '请罪'], ['三顾', '茅庐'],
-        ['高山', '流水'], ['风花', '雪月'], ['江郎', '才尽'], ['四面', '楚歌']
-    ];
-
     // 身份（按过关数）——古代科举
     var RANKS = [
         '白丁', '平民', '书生', '秀才·县试', '秀才·府试', '秀才·院试',
@@ -18,51 +8,55 @@
         '九品官', '八品官', '七品官', '六品官', '五品官', '四品官',
         '三品官', '二品官', '一品官', '丞相', '皇帝'
     ];
-
     var TRAY_MAX = 4;
+    var OUT_USES = 1, SHUFFLE_USES = 1, ERASE_USES = 1;
+    var HINT_SECONDS = 15;
 
     var boardEl = document.getElementById('board');
+    var subBoardsEl = document.getElementById('sub-boards');
     var trayEl = document.getElementById('tray');
     var holdEl = document.getElementById('hold');
+    var rankEl = document.getElementById('rank');
+    var levelEl = document.getElementById('level');
+    var leftEl = document.getElementById('left');
+    var slotnEl = document.getElementById('slotn');
+    var soundBtn = document.getElementById('sound');
     var propOutBtn = document.getElementById('prop-out');
     var propShuffleBtn = document.getElementById('prop-shuffle');
     var propEraseBtn = document.getElementById('prop-erase');
     var outCountEl = propOutBtn ? propOutBtn.querySelector('b') : null;
     var shuffleCountEl = propShuffleBtn ? propShuffleBtn.querySelector('b') : null;
     var eraseCountEl = propEraseBtn ? propEraseBtn.querySelector('b') : null;
-    var rankEl = document.getElementById('rank');
-    var levelEl = document.getElementById('level');
-    var leftEl = document.getElementById('left');
-    var slotnEl = document.getElementById('slotn');
-    var soundBtn = document.getElementById('sound');
     var restartBtn = document.getElementById('restart');
     var overlay = document.getElementById('overlay');
     var ovTitle = document.getElementById('ov-title');
     var ovText = document.getElementById('ov-text');
     var ovActions = document.getElementById('ov-actions');
+    var toastEl = document.getElementById('toast');
 
-    var OUT_USES = 1;
-    var SHUFFLE_USES = 1;
-    var ERASE_USES = 1;
+    var WORDS = window.WORDS || [];
+    var WORD_SET = window.WORD_SET || {};
+    var MEANINGS = window.MEANINGS || {};
 
     var level = 1;
     var tiles = [];
+    var boards = [];
     var tray = [];
     var hold = [];
     var trayCells = [];
     var inflight = 0;
     var cleared = 0;
     var over = false;
-    var outUses = OUT_USES;
-    var shuffleUses = SHUFFLE_USES;
-    var eraseUses = ERASE_USES;
+    var outUses = OUT_USES, shuffleUses = SHUFFLE_USES, eraseUses = ERASE_USES;
     var pickingErase = false;
-    var TS = 56;
     var soundOn = true;
     var audioCtx = null;
+    var TS = 56;
+    var idle = 0;
+    var hintTimer = null;
+    var toastTimer = null;
 
     function randInt(n) { return Math.floor(Math.random() * n); }
-
     function rankFor(lv) { return RANKS[Math.min(lv - 1, RANKS.length - 1)]; }
     function nextRankAfter(lv) { return RANKS[Math.min(lv, RANKS.length - 1)]; }
 
@@ -94,17 +88,9 @@
 
     var sound = {
         place: function () { beep(620, 0.06, 'sine', 0.04); },
-        clear: function () {
-            var seq = [587, 740, 880, 1175];
-            for (var i = 0; i < seq.length; i++) beep(seq[i], 0.16, 'sine', 0.07, i * 0.06);
-        },
-        win: function () {
-            var seq = [523, 659, 784, 1047, 1319];
-            for (var i = 0; i < seq.length; i++) beep(seq[i], 0.2, 'triangle', 0.07, i * 0.12);
-        },
-        lose: function () {
-            [400, 300, 200].forEach(function (f, i) { beep(f, 0.25, 'sawtooth', 0.06, i * 0.14); });
-        }
+        clear: function () { [587, 740, 880, 1175].forEach(function (f, i) { beep(f, 0.16, 'sine', 0.07, i * 0.06); }); },
+        win: function () { [523, 659, 784, 1047, 1319].forEach(function (f, i) { beep(f, 0.2, 'triangle', 0.07, i * 0.12); }); },
+        lose: function () { [400, 300, 200].forEach(function (f, i) { beep(f, 0.25, 'sawtooth', 0.06, i * 0.14); }); }
     };
 
     function shuffle(a) {
@@ -126,84 +112,116 @@
     }
 
     function overlap(a, b) {
-        return Math.abs(a.x - b.x) < TS * 0.6 && Math.abs(a.y - b.y) < TS * 0.6;
+        if (a.board !== b.board) return false;
+        var ts = (a.ts + b.ts) / 2;
+        return Math.abs(a.x - b.x) < ts * 0.6 && Math.abs(a.y - b.y) < ts * 0.6;
     }
 
     function isCovered(tile) {
         for (var i = 0; i < tiles.length; i++) {
             var o = tiles[i];
-            if (o.removed || o === tile) continue;
+            if (o.removed || o === tile || o.board !== tile.board) continue;
             if (o.layer > tile.layer && overlap(o, tile)) return true;
         }
         return false;
     }
 
-    function generate() {
-        var entries = Math.min(3 + level, 10);
-        var layers = Math.min(3 + Math.floor(level / 2), 6);
-        var boardW = boardEl.clientWidth;
-        var boardH = boardEl.clientHeight;
-        TS = Math.max(44, Math.round(boardW / 6.6));
-        var step = TS / 2;
-        var cols = Math.floor((boardW - TS) / step) + 1;
-        var rows = Math.floor((boardH - TS) / step) + 1;
+    function planBoards(totalTiles) {
+        var specs;
+        if (level * 10 >= 50) {
+            var small = Math.max(2, Math.round(totalTiles * 0.10));
+            specs = [{ small: false, count: totalTiles - 2 * small }, { small: true, count: small }, { small: true, count: small }];
+        } else {
+            specs = [{ small: false, count: totalTiles }];
+        }
+        return specs;
+    }
 
-        var total = entries * 2;
-        var counts = distribute(total, layers);
-        tiles = [];
-
-        for (var l = 0; l < layers; l++) {
+    function placeBoard(b, count) {
+        var step = b.ts / 2;
+        var cols = Math.max(2, Math.floor((b.W - b.ts) / step) + 1);
+        var rows = Math.max(2, Math.floor((b.H - b.ts) / step) + 1);
+        var placed = 0, layer = 0;
+        while (placed < count && layer < 80) {
+            var cells = [];
+            for (var gx = 0; gx < cols; gx++) {
+                for (var gy = 0; gy < rows; gy++) cells.push([gx, gy]);
+            }
+            shuffle(cells);
             var used = [];
-            var made = 0, guard = 0;
-            while (made < counts[l] && guard < 8000) {
-                guard++;
-                var gx = randInt(cols), gy = randInt(rows);
+            for (var c = 0; c < cells.length && placed < count; c++) {
+                var x = cells[c][0], y = cells[c][1];
                 var clash = false;
                 for (var u = 0; u < used.length; u++) {
-                    if (Math.abs(used[u][0] - gx) < 2 && Math.abs(used[u][1] - gy) < 2) { clash = true; break; }
+                    if (Math.abs(used[u][0] - x) < 2 && Math.abs(used[u][1] - y) < 2) { clash = true; break; }
                 }
                 if (clash) continue;
-                used.push([gx, gy]);
-                tiles.push({ x: gx * step, y: gy * step, layer: l, removed: false, entryId: 0, part: 'a', text: '' });
-                made++;
+                used.push([x, y]);
+                tiles.push({ board: b.id, ts: b.ts, x: x * step, y: y * step, layer: layer, removed: false, text: '', word: '' });
+                placed++;
             }
+            layer++;
         }
-        // 需要恰好 total 个，多了裁掉，少了补在最上层
-        while (tiles.length > total) tiles.pop();
-        var guard2 = 0;
-        while (tiles.length < total && guard2 < 4000) {
-            guard2++;
-            var gx2 = randInt(cols), gy2 = randInt(rows);
-            tiles.push({ x: gx2 * step, y: gy2 * step, layer: layers - 1, removed: false, entryId: 0, part: 'a', text: '' });
+        return placed;
+    }
+
+    function generate() {
+        var wordCount = Math.min(level * 10, WORDS.length);
+        var totalTiles = wordCount * 2;
+
+        subBoardsEl.textContent = '';
+        boardEl.classList.remove('small');
+        boards = [];
+        var specs = planBoards(totalTiles);
+        for (var i = 0; i < specs.length; i++) {
+            var el;
+            if (i === 0) {
+                el = boardEl;
+            } else {
+                el = document.createElement('div');
+                el.className = 'board small';
+                subBoardsEl.appendChild(el);
+            }
+            boards.push({ el: el, id: i, small: specs[i].small, count: specs[i].count, W: 0, H: 0, ts: 56 });
         }
 
-        // 选成语并生成两半
-        var pool = shuffle(IDIOMS.slice());
-        var parts = [];
-        for (var e = 0; e < entries; e++) {
-            var idiom = pool[e % pool.length];
-            parts.push({ id: e, part: 'a', text: idiom[0] });
-            parts.push({ id: e, part: 'b', text: idiom[1] });
+        tiles = [];
+        for (var b = 0; b < boards.length; b++) {
+            var bd = boards[b];
+            bd.W = bd.el.clientWidth;
+            bd.H = bd.el.clientHeight;
+            bd.ts = Math.max(34, Math.round(bd.W / 7));
+            placeBoard(bd, bd.count);
         }
-        shuffle(parts);
-        for (var k = 0; k < tiles.length; k++) {
-            tiles[k].entryId = parts[k].id;
-            tiles[k].part = parts[k].part;
-            tiles[k].text = parts[k].text;
+
+        if (tiles.length % 2 !== 0) tiles.pop();
+        var wc = Math.floor(tiles.length / 2);
+        var pool = shuffle(WORDS.slice());
+        if (!pool.length) return;
+        var flat = [];
+        for (var k = 0; k < wc; k++) {
+            var w = pool[k % pool.length];
+            flat.push({ text: w.slice(0, 2), word: w });
+            flat.push({ text: w.slice(2, 4), word: w });
+        }
+        shuffle(flat);
+        for (var t = 0; t < tiles.length; t++) {
+            tiles[t].text = flat[t].text;
+            tiles[t].word = flat[t].word;
         }
     }
 
     function renderTiles() {
         boardEl.textContent = '';
-        var frag = document.createDocumentFragment();
+        for (var b = 1; b < boards.length; b++) boards[b].el.textContent = '';
         for (var i = 0; i < tiles.length; i++) {
             var t = tiles[i];
             var el = document.createElement('div');
             el.className = 'tile';
-            el.style.width = TS + 'px';
-            el.style.height = TS + 'px';
+            el.style.width = t.ts + 'px';
+            el.style.height = t.ts + 'px';
             el.style.transform = 'translate(' + t.x + 'px,' + t.y + 'px)';
-            el.style.fontSize = Math.round(TS * 0.30) + 'px';
+            el.style.fontSize = Math.round(t.ts * 0.30) + 'px';
             el.style.zIndex = String(t.layer * 1000 + i);
             el.textContent = t.text;
             (function (tile, node) {
@@ -213,9 +231,8 @@
                 });
             })(t, el);
             t.el = el;
-            frag.appendChild(el);
+            boards[t.board].el.appendChild(el);
         }
-        boardEl.appendChild(frag);
         updateCovered();
     }
 
@@ -239,10 +256,7 @@
                 if (pickingErase) {
                     c.classList.add('pick');
                     (function (idx) {
-                        c.addEventListener('pointerdown', function (e) {
-                            e.preventDefault();
-                            eraseAt(idx);
-                        });
+                        c.addEventListener('pointerdown', function (e) { e.preventDefault(); eraseAt(idx); });
                     })(i);
                 }
             }
@@ -260,21 +274,11 @@
                 c.classList.add('filled');
                 c.textContent = hold[i].text;
                 (function (idx) {
-                    c.addEventListener('pointerdown', function (e) {
-                        e.preventDefault();
-                        returnHeld(idx);
-                    });
+                    c.addEventListener('pointerdown', function (e) { e.preventDefault(); returnHeld(idx); });
                 })(i);
             }
             holdEl.appendChild(c);
         }
-    }
-
-    function returnHeld(idx) {
-        if (over || idx < 0 || idx >= hold.length) return;
-        var tile = hold.splice(idx, 1)[0];
-        renderHold();
-        addToTray(tile);
     }
 
     function updateProps() {
@@ -285,74 +289,6 @@
         if (shuffleCountEl) shuffleCountEl.textContent = shuffleUses;
         if (eraseCountEl) eraseCountEl.textContent = eraseUses;
         if (propEraseBtn) propEraseBtn.classList.toggle('picking', pickingErase);
-    }
-
-    function propOut() {
-        if (over || outUses <= 0 || tray.length === 0) return;
-        var moved = 0;
-        while (moved < 2 && tray.length > 0) { hold.push(tray.pop()); moved++; }
-        outUses--;
-        pickingErase = false;
-        renderTray();
-        renderHold();
-        updateProps();
-        updateHud();
-        sound.place();
-    }
-
-    function propShuffle() {
-        if (over || shuffleUses <= 0) return;
-        var remain = tiles.filter(function (t) { return !t.removed; });
-        var datas = remain.map(function (t) { return { entryId: t.entryId, part: t.part, text: t.text }; });
-        shuffle(datas);
-        remain.forEach(function (t, idx) {
-            t.entryId = datas[idx].entryId;
-            t.part = datas[idx].part;
-            t.text = datas[idx].text;
-            if (t.el) t.el.textContent = t.text;
-        });
-        shuffleUses--;
-        pickingErase = false;
-        updateProps();
-        sound.place();
-    }
-
-    function propErase() {
-        if (over || eraseUses <= 0) return;
-        if (tray.length === 0) return;
-        pickingErase = !pickingErase;
-        updateProps();
-        renderTray();
-    }
-
-    function eraseAt(i) {
-        if (!pickingErase || i < 0 || i >= tray.length) return;
-        var tile = tray[i];
-        var cell = trayCells[i];
-        var rect = cell ? cell.getBoundingClientRect() : null;
-        var partner = null;
-        for (var k = 0; k < tiles.length; k++) {
-            var t = tiles[k];
-            if (!t.removed && t.entryId === tile.entryId && t.part !== tile.part) { partner = t; break; }
-        }
-        pickingErase = false;
-        eraseUses--;
-        if (rect) burstAtPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-        if (partner) {
-            partner.removed = true;
-            if (partner.el) {
-                partner.el.classList.add('taken');
-                (function (el) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 200); })(partner.el);
-            }
-        }
-        tray.splice(i, 1);
-        cleared += 2;
-        renderTray();
-        updateCovered();
-        updateProps();
-        updateHud();
-        sound.clear();
-        checkEnd();
     }
 
     function updateHud() {
@@ -368,9 +304,70 @@
         return n;
     }
 
+    function freeTiles() {
+        var out = [];
+        for (var i = 0; i < tiles.length; i++) {
+            var t = tiles[i];
+            if (!t.removed && !isCovered(t)) out.push(t);
+        }
+        return out;
+    }
+
+    function showMeaning(word) {
+        var m = MEANINGS[word] || '';
+        toastEl.textContent = '';
+        var b = document.createElement('b');
+        b.textContent = word;
+        toastEl.appendChild(b);
+        if (m) toastEl.appendChild(document.createTextNode('：' + m));
+        toastEl.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toastEl.classList.remove('show'); }, 2400);
+    }
+
+    function onAction() { resetIdle(); }
+
+    function resetIdle() {
+        idle = 0;
+        clearHint();
+    }
+
+    function clearHint() {
+        if (hintTimer) { clearTimeout(hintTimer); hintTimer = null; }
+        for (var i = 0; i < tiles.length; i++) {
+            if (tiles[i].el) tiles[i].el.classList.remove('hint');
+        }
+    }
+
+    function tickIdle() {
+        if (over) return;
+        idle++;
+        if (idle >= HINT_SECONDS) {
+            idle = 0;
+            showHint();
+        }
+    }
+
+    function showHint() {
+        var free = freeTiles();
+        for (var i = 0; i < free.length; i++) {
+            for (var j = i + 1; j < free.length; j++) {
+                var a = free[i], b = free[j];
+                if (WORD_SET[a.text + b.text] || WORD_SET[b.text + a.text]) {
+                    if (a.el) a.el.classList.add('hint');
+                    if (b.el) b.el.classList.add('hint');
+                    if (hintTimer) clearTimeout(hintTimer);
+                    hintTimer = setTimeout(clearHint, 4000);
+                    return;
+                }
+            }
+        }
+    }
+
     function tryTap(tile) {
         if (over || tile.removed) return;
         if (isCovered(tile)) return;
+        onAction();
         tile.removed = true;
         startFlight(tile);
         updateCovered();
@@ -392,7 +389,7 @@
         clone.style.top = from.top + 'px';
         clone.style.width = from.width + 'px';
         clone.style.height = from.height + 'px';
-        clone.style.fontSize = Math.round(TS * 0.30) + 'px';
+        clone.style.fontSize = Math.round(tile.ts * 0.30) + 'px';
         clone.textContent = tile.text;
         document.body.appendChild(clone);
 
@@ -412,31 +409,34 @@
         }, 300);
     }
 
+    function findPair() {
+        for (var i = 0; i < tray.length; i++) {
+            for (var j = i + 1; j < tray.length; j++) {
+                var c1 = tray[i].text + tray[j].text;
+                var c2 = tray[j].text + tray[i].text;
+                if (WORD_SET[c1]) return { i: i, j: j, word: c1 };
+                if (WORD_SET[c2]) return { i: i, j: j, word: c2 };
+            }
+        }
+        return null;
+    }
+
     function addToTray(tile) {
         tray.push(tile);
         renderTray();
 
-        var pair = null;
-        for (var i = 0; i < tray.length && !pair; i++) {
-            for (var j = i + 1; j < tray.length; j++) {
-                if (tray[i].entryId === tray[j].entryId && tray[i].part !== tray[j].part) {
-                    pair = [i, j];
-                    break;
-                }
-            }
-        }
-
+        var pair = findPair();
         if (pair) {
-            var a = pair[0], b = pair[1];
-            if (trayCells[a]) trayCells[a].classList.add('clearing');
-            if (trayCells[b]) trayCells[b].classList.add('clearing');
-            if (trayCells[b]) burstAt(trayCells[b]);
+            if (trayCells[pair.i]) trayCells[pair.i].classList.add('clearing');
+            if (trayCells[pair.j]) trayCells[pair.j].classList.add('clearing');
+            if (trayCells[pair.j]) burstAt(trayCells[pair.j]);
+            showMeaning(pair.word);
             cleared += 2;
             sound.clear();
             updateHud();
             setTimeout(function () {
-                tray.splice(b, 1);
-                tray.splice(a, 1);
+                tray.splice(pair.j, 1);
+                tray.splice(pair.i, 1);
                 renderTray();
                 checkEnd();
             }, 340);
@@ -459,9 +459,7 @@
         var promoted = nextRankAfter(level);
         ovTitle.textContent = '过关！';
         ovText.innerHTML = '晋升为 <b>' + promoted + '</b>';
-        showActions([
-            { text: '进入第 ' + (level + 1) + ' 关', primary: true, fn: function () { level++; newGame(); } }
-        ]);
+        showActions([{ text: '进入第 ' + (level + 1) + ' 关', primary: true, fn: function () { level++; newGame(); } }]);
         overlay.classList.remove('hidden');
         updateProps();
     }
@@ -491,6 +489,90 @@
                 ovActions.appendChild(b);
             })(list[i]);
         }
+    }
+
+    function returnHeld(idx) {
+        if (over || idx < 0 || idx >= hold.length) return;
+        onAction();
+        var tile = hold.splice(idx, 1)[0];
+        renderHold();
+        addToTray(tile);
+    }
+
+    function propOut() {
+        if (over || outUses <= 0 || tray.length === 0) return;
+        onAction();
+        var moved = 0;
+        while (moved < 2 && tray.length > 0) { hold.push(tray.pop()); moved++; }
+        outUses--;
+        pickingErase = false;
+        renderTray();
+        renderHold();
+        updateProps();
+        updateHud();
+        sound.place();
+    }
+
+    function propShuffle() {
+        if (over || shuffleUses <= 0) return;
+        onAction();
+        var remain = tiles.filter(function (t) { return !t.removed; });
+        var datas = remain.map(function (t) { return { text: t.text, word: t.word }; });
+        shuffle(datas);
+        remain.forEach(function (t, idx) {
+            t.text = datas[idx].text;
+            t.word = datas[idx].word;
+            if (t.el) t.el.textContent = t.text;
+        });
+        shuffleUses--;
+        pickingErase = false;
+        updateProps();
+        sound.place();
+    }
+
+    function propErase() {
+        if (over || eraseUses <= 0) return;
+        if (tray.length === 0) return;
+        onAction();
+        pickingErase = !pickingErase;
+        updateProps();
+        renderTray();
+    }
+
+    function eraseAt(i) {
+        if (!pickingErase || i < 0 || i >= tray.length) return;
+        onAction();
+        var tile = tray[i];
+        var cell = trayCells[i];
+        var rect = cell ? cell.getBoundingClientRect() : null;
+
+        var partner = null, word = null;
+        var board = tiles.filter(function (t) { return !t.removed; });
+        for (var k = 0; k < board.length; k++) {
+            var c1 = tile.text + board[k].text;
+            var c2 = board[k].text + tile.text;
+            if (WORD_SET[c1]) { partner = board[k]; word = c1; break; }
+            if (WORD_SET[c2]) { partner = board[k]; word = c2; break; }
+        }
+        pickingErase = false;
+        eraseUses--;
+        if (rect) burstAtPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        if (partner) {
+            partner.removed = true;
+            if (partner.el) {
+                partner.el.classList.add('taken');
+                (function (el) { setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 200); })(partner.el);
+            }
+        }
+        if (word) showMeaning(word);
+        tray.splice(i, 1);
+        cleared += 2;
+        renderTray();
+        updateCovered();
+        updateProps();
+        updateHud();
+        sound.clear();
+        checkEnd();
     }
 
     function burstAtPoint(cx, cy) {
@@ -530,6 +612,8 @@
         shuffleUses = SHUFFLE_USES;
         eraseUses = ERASE_USES;
         pickingErase = false;
+        resetIdle();
+        if (toastEl) toastEl.classList.remove('show');
         overlay.classList.add('hidden');
         generate();
         renderTiles();
@@ -545,11 +629,12 @@
         soundBtn.textContent = soundOn ? '音效' : '静音';
         if (soundOn) sound.place();
     });
-
     restartBtn.addEventListener('click', function () { level = 1; newGame(); });
     if (propOutBtn) propOutBtn.addEventListener('click', propOut);
     if (propShuffleBtn) propShuffleBtn.addEventListener('click', propShuffle);
     if (propEraseBtn) propEraseBtn.addEventListener('click', propErase);
+
+    setInterval(tickIdle, 1000);
 
     newGame();
 })();

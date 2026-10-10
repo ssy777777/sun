@@ -25,11 +25,26 @@
 
     var WORDS = window.WORDS || [];
     var WORD_SET = window.WORD_SET || {};
-    var byFirst = {};
-    WORDS.forEach(function (w) {
-        var c = w.charAt(0);
-        (byFirst[c] = byFirst[c] || []).push(w);
-    });
+    var PINYIN = window.PINYIN || {};
+    var pinyinCache = {};
+    function pinyinOf(ch) {
+        if (pinyinCache[ch] !== undefined) return pinyinCache[ch];
+        var p = PINYIN[ch] || null;
+        pinyinCache[ch] = p;
+        return p;
+    }
+    function sameSound(a, b) {
+        if (!a || !b) return false;
+        if (a === b) return true;
+        var pa = pinyinOf(a), pb = pinyinOf(b);
+        return !!(pa && pb && pa === pb);
+    }
+    function hasContinuation(char) {
+        for (var i = 0; i < WORDS.length; i++) {
+            if (sameSound(WORDS[i].charAt(0), char)) return true;
+        }
+        return false;
+    }
 
     var lives = LIVES_MAX;
     var score = 0;
@@ -86,7 +101,9 @@
     }
 
     function validContinuations(char) {
-        return (byFirst[char] || []).filter(function (w) { return !used[w]; });
+        return WORDS.filter(function (w) {
+            return !used[w] && sameSound(w.charAt(0), char);
+        });
     }
 
     function renderChain() {
@@ -134,9 +151,9 @@
 
     function newChain(reason) {
         var start = null;
-        for (var g = 0; g < 500; g++) {
+        for (var g = 0; g < 800; g++) {
             var w = WORDS[randInt(WORDS.length)];
-            if ((byFirst[w.charAt(3)] || []).length) { start = w; break; }
+            if (hasContinuation(w.charAt(3))) { start = w; break; }
         }
         if (!start) start = WORDS[0];
         chain = [start];
@@ -147,7 +164,7 @@
         answerEl.value = '';
         locked = false;
         if (reason) feedback(reason, 'bad');
-        else feedback('请接以「' + requiredChar + '」开头的成语', '');
+        else feedback('请接以「' + requiredChar + '」开头（或同音字）的成语', '');
         answerEl.focus();
         startTimer();
     }
@@ -177,7 +194,9 @@
         var w = (answerEl.value || '').replace(/\s/g, '');
         if (!w) return;
         if (w.length !== 4) { feedback('要输入四字成语', 'bad'); return; }
-        if (w.charAt(0) !== requiredChar) { loseLife('要以「' + requiredChar + '」开头'); return; }
+        if (!sameSound(w.charAt(0), requiredChar)) {
+            loseLife('要以「' + requiredChar + '」（或同音字）开头'); return;
+        }
         if (!WORD_SET[w]) { feedback('词库未收录：' + w, 'bad'); return; }
         if (used[w]) { feedback('这个词已经用过啦', 'bad'); return; }
         sound.ok();

@@ -57,6 +57,7 @@
     var TS = 56;
     var idle = 0;
     var hintTimer = null;
+    var hintMarks = [];
     var history = [];
 
     function randInt(n) { return Math.floor(Math.random() * n); }
@@ -215,6 +216,7 @@
     }
 
     function renderTiles() {
+        hintMarks = [];
         boardEl.textContent = '';
         for (var b = 1; b < boards.length; b++) boards[b].el.textContent = '';
         for (var i = 0; i < tiles.length; i++) {
@@ -369,9 +371,10 @@
 
     function clearHint() {
         if (hintTimer) { clearTimeout(hintTimer); hintTimer = null; }
-        for (var i = 0; i < tiles.length; i++) {
-            if (tiles[i].el) tiles[i].el.classList.remove('hint');
+        for (var i = 0; i < hintMarks.length; i++) {
+            if (hintMarks[i].parentNode) hintMarks[i].parentNode.removeChild(hintMarks[i]);
         }
+        hintMarks = [];
     }
 
     function tickIdle() {
@@ -383,15 +386,27 @@
         }
     }
 
+    // 高亮用一个独立的“框”覆盖在棋子上，不修改棋子本身（避免个别浏览器丢失 transform 导致移位）
+    function addHintMark(tile) {
+        var m = document.createElement('div');
+        m.className = 'hint-mark';
+        m.style.left = tile.x + 'px';
+        m.style.top = tile.y + 'px';
+        m.style.width = tile.ts + 'px';
+        m.style.height = tile.ts + 'px';
+        boards[tile.board].el.appendChild(m);
+        hintMarks.push(m);
+    }
+
     function showHint() {
+        clearHint();
         var free = freeTiles();
         for (var i = 0; i < free.length; i++) {
             for (var j = i + 1; j < free.length; j++) {
                 var a = free[i], b = free[j];
                 if (WORD_SET[a.text + b.text] || WORD_SET[b.text + a.text]) {
-                    if (a.el) a.el.classList.add('hint');
-                    if (b.el) b.el.classList.add('hint');
-                    if (hintTimer) clearTimeout(hintTimer);
+                    addHintMark(a);
+                    addHintMark(b);
                     hintTimer = setTimeout(clearHint, 4000);
                     return;
                 }

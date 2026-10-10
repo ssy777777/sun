@@ -118,24 +118,35 @@
 
     var boardEl = document.getElementById('board');
     var slotEl = document.getElementById('slot');
+    var holdEl = document.getElementById('hold');
     var diffSeg = document.getElementById('diff-seg');
     var leftEl = document.getElementById('left');
     var clearedEl = document.getElementById('cleared');
     var slotnEl = document.getElementById('slotn');
     var soundBtn = document.getElementById('sound');
+    var propOutBtn = document.getElementById('prop-out');
+    var propShuffleBtn = document.getElementById('prop-shuffle');
+    var outCountEl = propOutBtn ? propOutBtn.querySelector('b') : null;
+    var shuffleCountEl = propShuffleBtn ? propShuffleBtn.querySelector('b') : null;
     var restartBtn = document.getElementById('restart');
     var overlay = document.getElementById('overlay');
     var ovTitle = document.getElementById('ov-title');
     var ovText = document.getElementById('ov-text');
     var ovBtn = document.getElementById('ov-btn');
 
+    var OUT_USES = 1;
+    var SHUFFLE_USES = 1;
+
     var diff = 'mid';
     var tiles = [];
     var bar = [];
+    var hold = [];
     var slotCells = [];
     var inflight = 0;
     var cleared = 0;
     var over = false;
+    var outUses = OUT_USES;
+    var shuffleUses = SHUFFLE_USES;
     var TS = 56;
     var LAST_ORDER = [];
     var soundOn = true;
@@ -335,6 +346,100 @@
         return n;
     }
 
+    function renderHold() {
+        holdEl.textContent = '';
+        for (var i = 0; i < 3; i++) {
+            var c = document.createElement('div');
+            c.className = 'hold-cell';
+            if (i < hold.length) {
+                c.classList.add('filled');
+                c.style.background = tint(hold[i]);
+                c.style.borderColor = COLORS[hold[i]];
+                c.innerHTML = ANIMALS[hold[i]];
+                (function (idx) {
+                    c.addEventListener('pointerdown', function (e) {
+                        e.preventDefault();
+                        returnHeld(idx);
+                    });
+                })(i);
+            }
+            holdEl.appendChild(c);
+        }
+    }
+
+    function returnHeld(idx) {
+        if (over || idx < 0 || idx >= hold.length) return;
+        var type = hold.splice(idx, 1)[0];
+        renderHold();
+        addToBar(type);
+    }
+
+    function updateProps() {
+        if (propOutBtn) propOutBtn.disabled = outUses <= 0 || over;
+        if (propShuffleBtn) propShuffleBtn.disabled = shuffleUses <= 0 || over;
+        if (outCountEl) outCountEl.textContent = outUses;
+        if (shuffleCountEl) shuffleCountEl.textContent = shuffleUses;
+    }
+
+    function propOut() {
+        if (over || outUses <= 0 || bar.length === 0) return;
+        var moved = 0;
+        while (moved < 3 && bar.length > 0) { hold.push(bar.pop()); moved++; }
+        outUses--;
+        renderSlots();
+        renderHold();
+        updateProps();
+        updateHud();
+        sound.place();
+    }
+
+    function propShuffle() {
+        if (over || shuffleUses <= 0) return;
+        var remain = tiles.filter(function (t) { return !t.removed; });
+        var types = remain.map(function (t) { return t.type; });
+        for (var i = types.length - 1; i > 0; i--) {
+            var j = randInt(i + 1);
+            var tmp = types[i]; types[i] = types[j]; types[j] = tmp;
+        }
+        remain.forEach(function (t, idx) {
+            t.type = types[idx];
+            if (t.el) {
+                t.el.innerHTML = ANIMALS[t.type];
+                t.el.style.background = tint(t.type);
+                t.el.style.borderColor = COLORS[t.type];
+            }
+        });
+        shuffleUses--;
+        updateProps();
+        sound.place();
+    }
+
+    function burstAt(cell, color) {
+        var r = cell.getBoundingClientRect();
+        var cx = r.left + r.width / 2;
+        var cy = r.top + r.height / 2;
+        for (var i = 0; i < 10; i++) {
+            var p = document.createElement('span');
+            p.className = 'particle';
+            p.textContent = '★';
+            p.style.left = cx + 'px';
+            p.style.top = cy + 'px';
+            p.style.color = (i % 2 === 0) ? color : '#ffd54f';
+            document.body.appendChild(p);
+            (function (el) {
+                var ang = Math.random() * Math.PI * 2;
+                var dist = 26 + Math.random() * 46;
+                var dx = Math.round(Math.cos(ang) * dist);
+                var dy = Math.round(Math.sin(ang) * dist - 18);
+                requestAnimationFrame(function () {
+                    el.style.transform = 'translate(calc(-50% + ' + dx + 'px), calc(-50% + ' + dy + 'px)) scale(0.3) rotate(' + Math.floor(Math.random() * 360) + 'deg)';
+                    el.style.opacity = '0';
+                });
+                setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 700);
+            })(p);
+        }
+    }
+
     function tryTap(tile) {
         if (over || tile.removed) return;
         if (isCovered(tile)) return;
@@ -391,7 +496,10 @@
         if (idxs.length >= 3) {
             var three = idxs.slice(0, 3);
             for (var k = 0; k < three.length; k++) {
-                if (slotCells[three[k]]) slotCells[three[k]].classList.add('clearing');
+                if (slotCells[three[k]]) {
+                    slotCells[three[k]].classList.add('clearing');
+                    burstAt(slotCells[three[k]], COLORS[type]);
+                }
             }
             cleared += 3;
             sound.clear();
@@ -419,6 +527,7 @@
         ovTitle.textContent = '通关！';
         ovText.innerHTML = '难度 ' + diffName() + ' · 消除 <b>' + cleared + '</b> 个';
         overlay.classList.remove('hidden');
+        updateProps();
     }
 
     function gameOver() {
@@ -427,6 +536,7 @@
         ovTitle.textContent = '槽位满了';
         ovText.innerHTML = '剩余 <b>' + remaining() + '</b> 个 · 已消 <b>' + cleared + '</b> 个';
         overlay.classList.remove('hidden');
+        updateProps();
     }
 
     function diffName() { return diff === 'easy' ? '简单' : diff === 'hard' ? '困难' : '中等'; }
@@ -434,12 +544,17 @@
     function newGame() {
         over = false;
         bar = [];
+        hold = [];
         inflight = 0;
         cleared = 0;
+        outUses = OUT_USES;
+        shuffleUses = SHUFFLE_USES;
         overlay.classList.add('hidden');
         generate();
         renderTiles();
         renderSlots();
+        renderHold();
+        updateProps();
         updateHud();
     }
 
@@ -459,6 +574,9 @@
         soundBtn.textContent = soundOn ? '音效' : '静音';
         if (soundOn) sound.place();
     });
+
+    if (propOutBtn) propOutBtn.addEventListener('click', propOut);
+    if (propShuffleBtn) propShuffleBtn.addEventListener('click', propShuffle);
 
     restartBtn.addEventListener('click', newGame);
     ovBtn.addEventListener('click', newGame);

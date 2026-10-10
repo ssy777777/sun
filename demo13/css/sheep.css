@@ -169,6 +169,64 @@ body {
     100% { transform: scale(1.7); opacity: 0; }
 }
 
+/* 移出暂存区（卡槽上方） */
+.hold {
+    width: min(94vw, 420px);
+    height: 50px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    background: #ffffff;
+    border: 1px dashed var(--line);
+    border-radius: 12px;
+    padding: 6px;
+}
+
+.hold-cell {
+    border-radius: 8px;
+    background: #f4f8f1;
+    border: 1px dashed #cfe0c6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hold-cell.filled {
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+}
+
+.hold-cell svg { width: 80%; height: 80%; display: block; }
+
+/* 道具 */
+.props {
+    display: flex;
+    gap: 10px;
+}
+
+.props .act b {
+    color: var(--accent-2);
+    margin-left: 3px;
+}
+
+.props .act:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* 消除星星粒子 */
+.particle {
+    position: fixed;
+    font-size: 15px;
+    line-height: 1;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    transition: transform 0.65s ease-out, opacity 0.65s ease-out;
+    will-change: transform, opacity;
+}
+
 .slot {
     width: min(94vw, 420px);
     height: 52px;

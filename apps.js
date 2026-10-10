@@ -93,6 +93,11 @@ var APPS = [
         desc: '地点法训练：沿熟悉路线把词语放到各个地点（越离奇越好记），再按顺序回忆。可选「我的家 / 校园 / 公园」或自定义词语。',
         icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/><circle cx="12" cy="9" r="1.4" fill="currentColor" stroke="none"/></svg>'
     },
+    {
+        cat: '记忆力训练', title: '扑克牌记忆', href: './demo18/', color: '#0891b2',
+        desc: '记忆运动经典项目：记住顺序被打乱的扑克牌（5 / 10 / 20 / 整副 52 张），再按顺序复原。训练图像联想与有序记忆。',
+        icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="12" rx="1.5"/><path d="M7 8l1.6 1.6L7 11.2 5.4 9.6z" fill="currentColor" stroke="none"/><rect x="13" y="8" width="8" height="12" rx="1.5"/><circle cx="18" cy="14" r="1.6" fill="currentColor" stroke="none"/></svg>'
+    },
 
     // ---------- 益智 ----------
     {

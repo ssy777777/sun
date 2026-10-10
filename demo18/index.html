@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#eef4fb">
+    <title>扑克牌记忆</title>
+    <link rel="stylesheet" href="./css/cards.css?v=1">
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <h1>扑克牌记忆</h1>
+            <div class="best">最佳 <b id="best">0</b> 张全对</div>
+        </header>
+
+        <section id="screen-setup" class="screen">
+            <div class="row">
+                <span class="label">牌数</span>
+                <div class="chips" id="count-chips"></div>
+            </div>
+            <button id="start-btn" class="primary" type="button">开始记忆</button>
+            <p class="tip">方法：给每张牌一个**固定形象**（例如 ♠A = 一顶黑礼帽），再把它们串成一个故事或走一条你熟悉的路，按顺序记。先练少量，熟练后再挑战整副 52 张。</p>
+        </section>
+
+        <section id="screen-memorize" class="screen hide">
+            <div class="bar">
+                <span id="memo-prog">1 / 5</span>
+                <button id="memo-quit" class="act" type="button">返回</button>
+            </div>
+            <div class="bigwrap" id="bigwrap"></div>
+            <div class="bar">
+                <button id="memo-prev" class="act" type="button">上一张</button>
+                <button id="memo-next" class="primary" type="button">下一张</button>
+            </div>
+        </section>
+
+        <section id="screen-recall" class="screen hide">
+            <div class="bar">
+                <span class="hintline">按顺序点击下面的牌，依次填入上面格子（点格子可取回）</span>
+                <button id="recall-quit" class="act" type="button">返回</button>
+            </div>
+            <div class="slots" id="slots"></div>
+            <div class="pool" id="pool"></div>
+            <div class="bar">
+                <button id="recall-reset" class="act" type="button">重置</button>
+                <button id="recall-submit" class="primary" type="button">提交</button>
+            </div>
+            <div class="feed" id="recall-feed"></div>
+        </section>
+
+        <section id="screen-result" class="screen hide">
+            <div class="stars" id="res-stars"></div>
+            <h2 id="res-title">完成</h2>
+            <p id="res-text"></p>
+            <div class="list" id="res-list"></div>
+            <div class="bar">
+                <button id="res-again" class="primary" type="button">再来一次</button>
+                <button id="res-setup" class="act" type="button">换难度</button>
+            </div>
+        </section>
+    </div>
+
+    <script src="./js/cards.js?v=1"></script>
+</body>
+</html>

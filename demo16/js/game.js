@@ -101,6 +101,11 @@
         var rect = canvas.getBoundingClientRect();
         return V((cx - rect.left - offX) / scale, (cy - rect.top - offY) / scale);
     }
+    function clientXY(e) {
+        var t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0]);
+        if (t) return { x: t.clientX, y: t.clientY };
+        return { x: e.clientX, y: e.clientY };
+    }
 
     function makeBlock(x, y, w, h, mat) {
         var m = MAT[mat];
@@ -530,19 +535,24 @@
     }
     function onDown(e) {
         if (state === 'aiming' && currentBird) {
-            var p = toWorld(e.clientX, e.clientY);
-            if (len(sub(p, V(SLING.x, SLING.y))) > MAX_STRETCH + 70) return;
+            var c = clientXY(e);
+            var p = toWorld(c.x, c.y);
+            if (len(sub(p, V(SLING.x, SLING.y))) > MAX_STRETCH + 90) return;
             dragging = true; dragPos = clampDrag(p);
-            e.preventDefault();
+            if (e.pointerId !== undefined && canvas.setPointerCapture) {
+                try { canvas.setPointerCapture(e.pointerId); } catch (err) { }
+            }
+            if (e.preventDefault) e.preventDefault();
         } else if (state === 'flying') {
             triggerAbility();
-            e.preventDefault();
+            if (e.preventDefault) e.preventDefault();
         }
     }
     function onMove(e) {
         if (!dragging) return;
-        dragPos = clampDrag(toWorld(e.clientX, e.clientY));
-        e.preventDefault();
+        var c = clientXY(e);
+        dragPos = clampDrag(toWorld(c.x, c.y));
+        if (e.preventDefault) e.preventDefault();
     }
     function onUp() {
         if (!dragging) return;
@@ -551,10 +561,19 @@
         launch(mul(sub(SLING, dragPos), MAX_SPEED / MAX_STRETCH));
     }
 
+    var lastTouchTs = 0;
+    function markTouch() { lastTouchTs = Date.now(); }
     canvas.addEventListener('pointerdown', onDown);
     window.addEventListener('pointermove', onMove);
     window.addEventListener('pointerup', onUp);
     window.addEventListener('pointercancel', onUp);
+    canvas.addEventListener('touchstart', function (e) { markTouch(); onDown(e); }, { passive: false });
+    window.addEventListener('touchmove', function (e) { markTouch(); onMove(e); }, { passive: false });
+    window.addEventListener('touchend', function (e) { markTouch(); onUp(); });
+    window.addEventListener('touchcancel', function (e) { markTouch(); onUp(); });
+    canvas.addEventListener('mousedown', function (e) { if (Date.now() - lastTouchTs < 800) return; onDown(e); });
+    window.addEventListener('mousemove', function (e) { if (Date.now() - lastTouchTs < 800) return; onMove(e); });
+    window.addEventListener('mouseup', function (e) { if (Date.now() - lastTouchTs < 800) return; onUp(); });
     window.addEventListener('resize', resize);
     restartBtn.addEventListener('click', function () { startLevel(levelIndex); });
     ovRestart.addEventListener('click', function () { overlay.classList.add('hidden'); startLevel(levelIndex); });

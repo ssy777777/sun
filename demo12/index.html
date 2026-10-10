@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0e1220">
+    <title>N-Back</title>
+    <link rel="stylesheet" href="./css/nback.css">
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <h1>N-Back</h1>
+            <div class="best">最好 <b id="best">0</b>%</div>
+        </header>
+
+        <div class="hud">
+            <span>进度 <b id="prog">0/30</b></span>
+            <span>N = <b id="nval">2</b></span>
+            <span>正确率 <b id="acc">--</b></span>
+        </div>
+
+        <div class="board" id="board"></div>
+
+        <div class="buttons">
+            <button id="btn-vis" class="resp vis" type="button">位置匹配 <span>L</span></button>
+            <button id="btn-aud" class="resp aud" type="button">声音匹配 <span>A</span></button>
+        </div>
+
+        <div class="overlay" id="overlay">
+            <div id="start-screen" class="screen">
+                <h2>N-Back 工作记忆</h2>
+                <p>方块出现在 3×3 网格的某个位置，同时播放一个字母。<br>若当前与 <b>N 步前</b> 相同，就按下对应按钮。</p>
+                <div class="seg" id="n-seg">
+                    <button class="seg-btn" data-n="1" type="button">1-back</button>
+                    <button class="seg-btn active" data-n="2" type="button">2-back</button>
+                    <button class="seg-btn" data-n="3" type="button">3-back</button>
+                    <button class="seg-btn" data-n="4" type="button">4-back</button>
+                </div>
+                <div class="seg" id="spd-seg">
+                    <button class="seg-btn" data-spd="slow" type="button">慢</button>
+                    <button class="seg-btn active" data-spd="mid" type="button">中</button>
+                    <button class="seg-btn" data-spd="fast" type="button">快</button>
+                </div>
+                <p class="keys">键盘：L = 位置匹配　A = 声音匹配</p>
+                <button id="start" class="primary" type="button">开始</button>
+            </div>
+
+            <div id="result-screen" class="screen hidden">
+                <h2 id="res-title">训练完成</h2>
+                <p id="res-text"></p>
+                <button id="again" class="primary" type="button">再来一次</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/nback.js"></script>
+</body>
+</html>

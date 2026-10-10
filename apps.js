@@ -46,6 +46,11 @@ var APPS = [
         desc: '把词语/成语拆成两半，选两半拼成完整词句即消除；卡槽 4 格，逐关晋升（平民→书生→…→状元→…→皇帝）。',
         icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v6h6"/><path d="M8 12h8M8 16h5"/></svg>'
     },
+    {
+        cat: '小游戏', title: '成语接龙', href: './demo15/', color: '#2563eb',
+        desc: '输入以指定字开头的成语续接，接不上就换新链；含提示、计时与生命值，考验成语积累。',
+        icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"/><path d="M7.5 8H6a4 4 0 1 0 0 8h1.5"/><path d="M16.5 8H18a4 4 0 1 1 0 8h-1.5"/></svg>'
+    },
 
     // ---------- 记忆力训练 ----------
     {

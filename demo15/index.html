@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#eef4fb">
+    <title>成语接龙</title>
+    <link rel="stylesheet" href="./css/chain.css">
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <h1>成语接龙</h1>
+            <div class="best">最好 <b id="best">0</b></div>
+        </header>
+
+        <div class="hud">
+            <span>生命 <b id="lives">♥♥♥</b></span>
+            <span>接龙 <b id="score">0</b></span>
+            <span>时间 <b id="time">20</b></span>
+        </div>
+
+        <div class="prompt">
+            当前：<b id="current">?</b><br>
+            请接以「<b id="need">?</b>」开头的成语
+        </div>
+
+        <div class="chain" id="chain"></div>
+
+        <div class="feed" id="feed"></div>
+
+        <div class="input-row">
+            <input id="answer" type="text" maxlength="4" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="输入四字成语">
+            <button id="submit" class="primary" type="button">接龙</button>
+        </div>
+
+        <div class="foot">
+            <button id="hint" class="act" type="button">提示 3</button>
+            <button id="sound" class="act active" type="button">音效</button>
+            <button id="restart" class="act" type="button">重新开始</button>
+        </div>
+
+        <div class="overlay hidden" id="overlay">
+            <h2 id="ov-title"></h2>
+            <p id="ov-text"></p>
+            <div class="ov-actions" id="ov-actions"></div>
+        </div>
+    </div>
+
+    <script src="../demo14/words.js"></script>
+    <script src="./js/chain.js"></script>
+</body>
+</html>

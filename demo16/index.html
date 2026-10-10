@@ -11,28 +11,45 @@
     <div class="app">
         <header class="top">
             <h1>愤怒的小鸟</h1>
-            <div class="score">得分 <b id="hud-score">0</b></div>
+            <div class="top-right">
+                <span class="lvl" id="hud-level">1-1</span>
+                <span class="score">得分 <b id="hud-score">0</b></span>
+            </div>
         </header>
 
         <div class="stage-wrap">
             <canvas id="stage"></canvas>
+            <div class="hint" id="tap-hint">飞行中点击屏幕释放技能</div>
         </div>
 
         <div class="foot">
-            <span class="stat">小鸟 <b id="hud-birds">×3</b></span>
-            <span class="stat">猪 <b id="hud-pigs">×3</b></span>
+            <div class="birds" id="hud-birds"></div>
+            <span class="stat">猪 <b id="hud-pigs">×1</b></span>
+            <button id="menu-btn" class="act" type="button">选关</button>
             <button id="sound" class="act active" type="button">音效</button>
-            <button id="restart" class="act" type="button">重新开始</button>
+            <button id="restart" class="act" type="button">重开</button>
         </div>
 
         <div class="overlay hidden" id="overlay">
             <h2 id="ov-title"></h2>
+            <div class="stars" id="ov-stars"></div>
             <p id="ov-text"></p>
-            <button id="ov-restart" class="primary" type="button">再来一局</button>
+            <div class="ov-actions">
+                <button id="ov-next" class="primary" type="button">下一关</button>
+                <button id="ov-restart" class="act" type="button">重玩</button>
+                <button id="ov-menu" class="act" type="button">选关</button>
+            </div>
+        </div>
+
+        <div class="overlay hidden" id="menu">
+            <h2>选择关卡</h2>
+            <div class="menu-grid" id="menu-grid"></div>
+            <button id="menu-close" class="act" type="button">返回</button>
         </div>
     </div>
 
     <script src="./js/physics.js"></script>
+    <script src="./js/levels.js"></script>
     <script src="./js/game.js"></script>
 </body>
 </html>

@@ -44,10 +44,115 @@ body {
     letter-spacing: 2px;
 }
 
+.top-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.lvl {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--accent-2);
+}
+
 .score {
     font-size: 13px;
     color: var(--muted);
 }
+
+.birds {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 9px 12px;
+    min-height: 38px;
+    min-width: 60px;
+}
+
+.bdot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.14);
+}
+
+.hint {
+    position: absolute;
+    left: 50%;
+    top: 12px;
+    transform: translateX(-50%);
+    background: rgba(20, 40, 66, 0.78);
+    color: #fff;
+    font-size: 13px;
+    padding: 7px 14px;
+    border-radius: 20px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.hint.show { opacity: 1; }
+
+.stars {
+    display: flex;
+    gap: 6px;
+    font-size: 34px;
+    line-height: 1;
+}
+
+.star { color: rgba(255, 255, 255, 0.28); }
+.star.on { color: #ffd23f; text-shadow: 0 2px 8px rgba(255, 180, 0, 0.6); }
+
+.ov-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 6px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    max-width: 520px;
+    width: 100%;
+}
+
+.mlevel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.13);
+    color: #fff;
+    border-radius: 14px;
+    padding: 14px 8px;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.mlevel .ms {
+    display: flex;
+    gap: 2px;
+    font-size: 14px;
+}
+
+.mlevel .star { color: rgba(255, 255, 255, 0.3); }
+.mlevel .star.on { color: #ffd23f; }
+
+.mlevel.locked { opacity: 0.4; cursor: not-allowed; }
+.mlevel.locked b::after { content: " 锁"; font-size: 11px; font-weight: 400; }
+.mlevel:not(.locked):active { transform: scale(0.96); }
 
 .score b {
     color: var(--accent-2);

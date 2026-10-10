@@ -28,55 +28,46 @@
     var menuBtn = document.getElementById('menu');
 
     var GUN_SVG = [
-        // 沙漠之鹰（手枪）
-        '<svg viewBox="0 0 120 180">' +
-        '<defs>' +
-        '<linearGradient id="g0a" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#606b7d"/><stop offset="0.5" stop-color="#3b4553"/><stop offset="1" stop-color="#222932"/></linearGradient>' +
-        '<linearGradient id="g0b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#333b47"/><stop offset="1" stop-color="#1a202a"/></linearGradient>' +
-        '</defs>' +
-        '<rect x="48" y="12" width="24" height="82" rx="6" fill="url(#g0a)"/>' +
-        '<rect x="52" y="16" width="6" height="70" rx="3" fill="#7d8aa0" opacity=".7"/>' +
-        '<rect x="54" y="4" width="12" height="10" rx="2" fill="#12161c"/>' +
-        '<rect x="43" y="86" width="34" height="22" rx="6" fill="url(#g0b)"/>' +
-        '<rect x="45" y="90" width="30" height="4" rx="2" fill="#828ea6" opacity=".85"/>' +
-        '<path d="M50 106 L70 106 L78 158 Q60 172 50 158 Z" fill="#242b36"/>' +
-        '<path d="M54 110 L67 110 L71 150 L56 150 Z" fill="#171d25"/>' +
-        '<rect x="46" y="118" width="28" height="5" rx="2.5" fill="#3b4553"/>' +
-        '<circle cx="60" cy="93" r="3.4" fill="#9aa6bd" opacity=".85"/>' +
+        // 沙漠之鹰（Q版手枪）
+        '<svg viewBox="0 0 150 190">' +
+        '<g stroke="#20242c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">' +
+        '<rect x="52" y="18" width="46" height="86" rx="16" fill="#5ad1c8"/>' +
+        '<rect x="63" y="30" width="12" height="60" rx="6" fill="#9ff2ea" stroke="none" opacity=".75"/>' +
+        '<rect x="60" y="4" width="30" height="22" rx="11" fill="#3a4048"/>' +
+        '<rect x="44" y="96" width="62" height="34" rx="15" fill="#3f4650"/>' +
+        '<path d="M56 126 L98 126 L108 182 Q78 198 60 182 Z" fill="#2a2f37"/>' +
+        '<rect x="62" y="134" width="30" height="8" rx="4" fill="#5ad1c8" stroke="none"/>' +
+        '</g>' +
+        '<ellipse cx="80" cy="176" rx="27" ry="17" fill="#e6b17e" stroke="#20242c" stroke-width="4"/>' +
         '</svg>',
-        // AWM 狙击枪
-        '<svg viewBox="0 0 120 200">' +
-        '<defs>' +
-        '<linearGradient id="g1a" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4c5666"/><stop offset="1" stop-color="#232a35"/></linearGradient>' +
-        '<radialGradient id="g1l" cx="0.4" cy="0.35" r="0.8"><stop offset="0" stop-color="#c8ecff"/><stop offset="1" stop-color="#2b4a66"/></radialGradient>' +
-        '</defs>' +
-        '<rect x="56" y="4" width="8" height="104" rx="3" fill="url(#g1a)"/>' +
-        '<rect x="58" y="6" width="3" height="100" fill="#7d8aa0" opacity=".6"/>' +
-        '<rect x="52" y="8" width="16" height="6" rx="3" fill="#1a1f27"/>' +
-        '<rect x="48" y="52" width="24" height="10" rx="4" fill="#2a313c"/>' +
-        '<circle cx="60" cy="46" r="9" fill="#39424f"/><circle cx="60" cy="46" r="6" fill="url(#g1l)"/>' +
-        '<circle cx="60" cy="46" r="1.7" fill="#0c1016"/>' +
-        '<rect x="42" y="104" width="36" height="44" rx="8" fill="#2c3644"/>' +
-        '<rect x="46" y="110" width="28" height="5" rx="2.5" fill="#4c5666"/>' +
-        '<rect x="50" y="122" width="20" height="20" rx="3" fill="#1c222b"/>' +
-        '<path d="M46 146 L74 146 L82 194 L52 194 Z" fill="#222a34"/>' +
-        '<rect x="58" y="150" width="8" height="40" rx="2" fill="#161b22"/>' +
+        // AWM 狙击枪（Q版）
+        '<svg viewBox="0 0 150 230">' +
+        '<g stroke="#20242c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">' +
+        '<rect x="66" y="8" width="20" height="120" rx="9" fill="#7cc36a"/>' +
+        '<rect x="72" y="18" width="8" height="100" rx="4" fill="#c4f0a8" stroke="none" opacity=".6"/>' +
+        '<rect x="56" y="10" width="40" height="18" rx="9" fill="#3a4048"/>' +
+        '<rect x="52" y="60" width="48" height="22" rx="11" fill="#3a4048"/>' +
+        '<circle cx="76" cy="50" r="18" fill="#3a4048"/>' +
+        '<circle cx="76" cy="50" r="12" fill="#9fe0ff"/>' +
+        '<circle cx="71" cy="46" r="4" fill="#ffffff" stroke="none"/>' +
+        '<rect x="48" y="118" width="56" height="58" rx="18" fill="#5aa64a"/>' +
+        '<rect x="58" y="130" width="36" height="10" rx="5" fill="#c4f0a8" stroke="none" opacity=".5"/>' +
+        '<path d="M54 170 L98 170 L110 222 L62 222 Z" fill="#3f7a35"/>' +
+        '</g>' +
+        '<ellipse cx="86" cy="210" rx="28" ry="17" fill="#e6b17e" stroke="#20242c" stroke-width="4"/>' +
         '</svg>',
-        // 黄金巴祖卡（火箭筒）
-        '<svg viewBox="0 0 150 210">' +
-        '<defs>' +
-        '<linearGradient id="g2t" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#6f7852"/><stop offset="0.5" stop-color="#4a5340"/><stop offset="1" stop-color="#2e3525"/></linearGradient>' +
-        '<linearGradient id="g2h" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe89a"/><stop offset="1" stop-color="#c8912a"/></linearGradient>' +
-        '</defs>' +
-        '<path d="M55 8 L95 8 L87 42 L63 42 Z" fill="url(#g2h)"/>' +
-        '<rect x="50" y="40" width="50" height="120" rx="18" fill="url(#g2t)"/>' +
-        '<rect x="60" y="46" width="12" height="108" rx="6" fill="#818b62" opacity=".45"/>' +
-        '<rect x="42" y="72" width="66" height="10" rx="5" fill="#2c331f"/>' +
-        '<rect x="58" y="60" width="34" height="14" rx="4" fill="#3a4230"/>' +
-        '<rect x="40" y="140" width="70" height="18" rx="8" fill="#2a3226"/>' +
-        '<rect x="56" y="152" width="38" height="30" rx="7" fill="#333b2a"/>' +
-        '<rect x="62" y="182" width="26" height="22" rx="6" fill="#22281b"/>' +
-        '<circle cx="75" cy="120" r="5" fill="#c8912a"/>' +
+        // 黄金巴祖卡（Q版火箭筒）
+        '<svg viewBox="0 0 170 230">' +
+        '<g stroke="#20242c" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">' +
+        '<path d="M66 6 L104 6 L96 48 L74 48 Z" fill="#ffcf3a"/>' +
+        '<rect x="58" y="44" width="54" height="140" rx="26" fill="#7fae5b"/>' +
+        '<rect x="70" y="54" width="14" height="120" rx="7" fill="#c6e6a5" stroke="none" opacity=".5"/>' +
+        '<rect x="50" y="86" width="70" height="16" rx="8" fill="#3a4048"/>' +
+        '<rect x="68" y="64" width="34" height="18" rx="6" fill="#2f4a24"/>' +
+        '<rect x="62" y="166" width="44" height="40" rx="12" fill="#3a4048"/>' +
+        '<rect x="72" y="178" width="24" height="10" rx="5" fill="#ffcf3a" stroke="none"/>' +
+        '</g>' +
+        '<ellipse cx="84" cy="206" rx="30" ry="18" fill="#e6b17e" stroke="#20242c" stroke-width="4"/>' +
         '</svg>'
     ];
 
@@ -201,6 +192,7 @@
         el.style.top = '0';
         el.style.width = size + 'px';
         el.style.height = size + 'px';
+        el.style.setProperty('--hue', String(Math.floor(Math.random() * 360)));
         var fig = document.createElement('div');
         fig.className = 'fig';
         fig.innerHTML = '<div class="head"></div><div class="torso"></div>' +
@@ -224,8 +216,8 @@
             alive: true,
             vx: 0,
             cover: covered,
-            hcx: 0, hcy: 0, hr: size * 0.15,
-            bcx: 0, bcy: 0, br: size * 0.36
+            hcx: 0, hcy: 0, hr: size * 0.23,
+            bcx: 0, bcy: 0, br: size * 0.32
         };
         e.x = 8 + Math.random() * (W - size - 16);
         e.y = 30 + Math.random() * (H - size - 80);
@@ -240,9 +232,9 @@
     function placeEnemy(e) {
         e.el.style.transform = 'translate(' + e.x + 'px,' + e.y + 'px)';
         e.hcx = e.x + e.size / 2;
-        e.hcy = e.y + e.size * 0.15;
+        e.hcy = e.y + e.size * 0.23;
         e.bcx = e.x + e.size / 2;
-        e.bcy = e.y + e.size * 0.55;
+        e.bcy = e.y + e.size * 0.60;
     }
 
     function makeBarrel() {
@@ -347,7 +339,7 @@
                     var e2 = enemies[k];
                     if (!e2.alive) continue;
                     // 有掩体的敌人，身体被挡住：打在掩体上不造成伤害
-                    if (e2.cover && fy > e2.y + e2.size * 0.34) continue;
+                    if (e2.cover && fy > e2.y + e2.size * 0.44) continue;
                     if (Math.hypot(e2.bcx - fx, e2.bcy - fy) <= e2.br) {
                         e2.hp -= wpn.dmg;
                         e2.el.classList.add('body-hit');

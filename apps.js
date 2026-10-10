@@ -51,6 +51,11 @@ var APPS = [
         desc: '输入以指定字开头的成语续接，接不上就换新链；含提示、计时与生命值，考验成语积累。',
         icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"/><path d="M7.5 8H6a4 4 0 1 0 0 8h1.5"/><path d="M16.5 8H18a4 4 0 1 1 0 8h-1.5"/></svg>'
     },
+    {
+        cat: '小游戏', title: '愤怒的小鸟', href: './demo16/', color: '#e8483e',
+        desc: '拖拽弹弓发射小鸟，击碎木/石/玻璃结构、消灭全部绿猪；自研 2D 物理，结构会堆叠倒塌。',
+        icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6"/><path d="M16 8h5l-5 3z"/><path d="M8 8.5h.01"/><path d="M2 22l3.5-3.5"/></svg>'
+    },
 
     // ---------- 记忆力训练 ----------
     {

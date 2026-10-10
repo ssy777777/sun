@@ -48,7 +48,7 @@
     var levelIndex = 0;
     var score = 0, state = 'aiming', paused = false;
     var dragging = false, dragPos = V(SLING.x, SLING.y);
-    var flyT = 0;
+    var flyT = 0, camX = 0, pigSfxCd = 0, gameTime = 0;
     var PEND_SPACING = 42, ENTER_TIME = 0.42;
     var soundOn = true, audioCtx = null, lastT = 0;
     var prog = { unlocked: 1, stars: {} };
@@ -82,6 +82,7 @@
     var sfx = {
         launch: function () { beep(300, 0.16, 'sawtooth', 0.07); beep(520, 0.12, 'sine', 0.05, 0.05); },
         hit: function () { beep(150, 0.07, 'square', 0.05); },
+        pig: function () { beep(560, 0.06, 'square', 0.06); beep(320, 0.13, 'sawtooth', 0.05, 0.05); },
         pop: function () { beep(700, 0.09, 'triangle', 0.07); beep(980, 0.09, 'triangle', 0.06, 0.05); },
         dash: function () { beep(900, 0.12, 'sawtooth', 0.06); },
         split: function () { [700, 840, 980].forEach(function (f, i) { beep(f, 0.08, 'square', 0.05, i * 0.03); }); },
@@ -119,7 +120,7 @@
     }
     function makePig(x, y) {
         var body = new Phys.Body({ shape: Phys.Circle(20), position: V(x, y), density: 0.6, restitution: 0.2, friction: 0.7 });
-        var pig = { body: body, hp: 60, dead: false, flash: 0 };
+        var pig = { body: body, hp: 60, dead: false, flash: 0, hurtT: 0 };
         body.data = { kind: 'pig', pig: pig };
         world.add(body); pigs.push(pig);
     }
@@ -259,6 +260,10 @@
             if (d.block.hp <= 0) destroyBlock(d.block);
         } else if (d.kind === 'pig' && !d.pig.dead) {
             d.pig.hp -= dmg; d.pig.flash = 1;
+            if (dmg > 6) {
+                d.pig.hurtT = 0.7;
+                if (pigSfxCd <= 0) { sfx.pig(); pigSfxCd = 0.15; }
+            }
             if (d.pig.hp <= 0) destroyPig(d.pig);
         }
     }
@@ -302,6 +307,21 @@
 
     function step(dt) {
         if (paused) return;
+        gameTime += dt;
+        if (pigSfxCd > 0) pigSfxCd -= dt;
+
+        // 轻微相机跟随：飞行时朝小鸟方向平移，限制在可用横向留白内
+        var camTarget = 0;
+        if (state === 'flying' && activeBirds.length) {
+            var bx = activeBirds[0].body.position.x;
+            camTarget = (bx - 560) * 0.32;
+        }
+        var marginWorld = Math.max(0, (cw - WORLD_W * scale) / (2 * scale));
+        var lim = Math.min(marginWorld, 260);
+        if (camTarget > lim) camTarget = lim; else if (camTarget < -lim) camTarget = -lim;
+        camX += (camTarget - camX) * Math.min(1, dt * 3.5);
+        if (Math.abs(camX) < 0.05 && camTarget === 0) camX = 0;
+
         if (state === 'entering') {
             currentBird.enterT += dt;
             var tt = Math.min(1, currentBird.enterT / ENTER_TIME);
@@ -446,7 +466,7 @@
         g.addColorStop(0, '#bfe4ff'); g.addColorStop(0.7, '#e8f6ff'); g.addColorStop(1, '#d6f0e0');
         ctx.fillStyle = g; ctx.fillRect(0, 0, cw, ch);
 
-        ctx.setTransform(dpr * scale, 0, 0, dpr * scale, dpr * offX, dpr * offY);
+        ctx.setTransform(dpr * scale, 0, 0, dpr * scale, dpr * (offX - camX * scale), dpr * offY);
 
         ctx.fillStyle = '#7cc36a'; ctx.fillRect(-3000, GROUND_Y, 9000, 12);
         ctx.fillStyle = '#b98a52'; ctx.fillRect(-3000, GROUND_Y + 12, 9000, WORLD_H);
@@ -521,11 +541,23 @@
         ctx.save(); ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
         ctx.fillStyle = '#7ec850'; ctx.beginPath(); ctx.arc(0, 0, 20, 0, 7); ctx.fill();
         ctx.lineWidth = 3; ctx.strokeStyle = '#4f972c'; ctx.stroke();
+        ctx.fillStyle = '#6fbd45';
+        ctx.beginPath(); ctx.moveTo(-14, -12); ctx.lineTo(-7, -19); ctx.lineTo(-4, -11); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(14, -12); ctx.lineTo(7, -19); ctx.lineTo(4, -11); ctx.closePath(); ctx.fill();
         ctx.fillStyle = '#8fd35f'; ctx.beginPath(); ctx.arc(0, 4, 8, 0, 7); ctx.fill();
         ctx.fillStyle = '#3f7a22'; ctx.beginPath(); ctx.arc(-3, 4, 1.8, 0, 7); ctx.arc(3, 4, 1.8, 0, 7); ctx.fill();
-        ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-6, -6, 4, 0, 7); ctx.arc(6, -6, 4, 0, 7); ctx.fill();
-        ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(-5, -6, 1.8, 0, 7); ctx.arc(7, -6, 1.8, 0, 7); ctx.fill();
-        if (pig.flash > 0) { ctx.globalAlpha = pig.flash * 0.6; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(0, 0, 20, 0, 7); ctx.fill(); ctx.globalAlpha = 1; }
+        if (pig.hurtT > 0) {
+            ctx.strokeStyle = '#2c4a18'; ctx.lineWidth = 2.5;
+            ctx.beginPath(); ctx.moveTo(-11, -11); ctx.lineTo(-3, -7); ctx.moveTo(11, -11); ctx.lineTo(3, -7); ctx.stroke();
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-6, -4, 3.4, 0, 7); ctx.arc(6, -4, 3.4, 0, 7); ctx.fill();
+            ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(-5, -4, 1.6, 0, 7); ctx.arc(7, -4, 1.6, 0, 7); ctx.fill();
+            ctx.fillStyle = '#7a3b1a'; ctx.beginPath(); ctx.arc(0, 7, 3.4, 0, 7); ctx.fill();
+            ctx.fillStyle = '#5aa6e0'; ctx.beginPath(); ctx.arc(-15, -6, 2.6, 0, 7); ctx.fill();
+        } else {
+            ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(-6, -6, 4, 0, 7); ctx.arc(6, -6, 4, 0, 7); ctx.fill();
+            ctx.fillStyle = '#222'; ctx.beginPath(); ctx.arc(-5, -6, 1.8, 0, 7); ctx.arc(7, -6, 1.8, 0, 7); ctx.fill();
+        }
+        if (pig.flash > 0) { ctx.globalAlpha = pig.flash * 0.5; ctx.fillStyle = '#ff5555'; ctx.beginPath(); ctx.arc(0, 0, 20, 0, 7); ctx.fill(); ctx.globalAlpha = 1; }
         ctx.restore();
     }
     function drawEgg(pos) {
@@ -548,7 +580,7 @@
         var label = '× ' + activePigs();
         ctx.font = 'bold 22px "Segoe UI","Microsoft YaHei",sans-serif';
         var tw = ctx.measureText(label).width, pad = 12, iconR = 11;
-        var totalW = iconR * 2 + 8 + tw + pad * 2, bx = WORLD_W - 24 - totalW, by = 16, cy = by + 20;
+        var totalW = iconR * 2 + 8 + tw + pad * 2, bx = WORLD_W + camX - 24 - totalW, by = 16, cy = by + 20;
         ctx.fillStyle = 'rgba(255,255,255,0.82)';
         ctx.strokeStyle = 'rgba(0,0,0,0.08)'; ctx.lineWidth = 1;
         roundRectPath(bx, by, totalW, 40, 12); ctx.fill(); ctx.stroke();
@@ -586,7 +618,10 @@
             var steps = 2, h = dt / steps;
             for (var i = 0; i < steps; i++) step(h);
             for (var k = 0; k < blocks.length; k++) if (blocks[k].flash > 0) blocks[k].flash = Math.max(0, blocks[k].flash - dt * 3);
-            for (var q = 0; q < pigs.length; q++) if (pigs[q].flash > 0) pigs[q].flash = Math.max(0, pigs[q].flash - dt * 3);
+            for (var q = 0; q < pigs.length; q++) {
+                if (pigs[q].flash > 0) pigs[q].flash = Math.max(0, pigs[q].flash - dt * 3);
+                if (pigs[q].hurtT > 0) pigs[q].hurtT = Math.max(0, pigs[q].hurtT - dt);
+            }
             render();
         } catch (e) {
             if (window.console && console.error) console.error('bird loop error:', e);

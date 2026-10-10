@@ -7,33 +7,111 @@
         hard: { total: 60, layers: 6, palette: 12 }
     };
 
-    // 12 生肖 Q版小动物（内联 SVG，viewBox 100x100）
+    // ---------- 12 生肖 Q版小人（头 + 身体 + 夸张表情）----------
+    function chibi(c) {
+        var s = '<svg viewBox="0 0 100 100">';
+        if (c.ears) s += c.ears;
+        s += '<rect x="33" y="62" width="34" height="30" rx="16" fill="' + c.body + '"/>';
+        s += '<circle cx="28" cy="76" r="7.5" fill="' + c.body + '"/><circle cx="72" cy="76" r="7.5" fill="' + c.body + '"/>';
+        s += '<rect x="39" y="87" width="10" height="10" rx="5" fill="' + (c.foot || c.body) + '"/><rect x="51" y="87" width="10" height="10" rx="5" fill="' + (c.foot || c.body) + '"/>';
+        s += '<ellipse cx="50" cy="44" rx="31" ry="29" fill="' + c.head + '"/>';
+        if (c.faceTop) s += c.faceTop;
+        s += '<ellipse cx="38.5" cy="42" rx="7.5" ry="8.5" fill="#fff"/><ellipse cx="61.5" cy="42" rx="7.5" ry="8.5" fill="#fff"/>';
+        s += '<circle cx="40" cy="43" r="4.2" fill="#2b2b38"/><circle cx="60" cy="43" r="4.2" fill="#2b2b38"/>';
+        s += '<circle cx="38" cy="40.5" r="1.7" fill="#fff"/><circle cx="58" cy="40.5" r="1.7" fill="#fff"/>';
+        s += '<ellipse cx="26" cy="52" rx="6" ry="4" fill="#f7a6b8" opacity=".6"/><ellipse cx="74" cy="52" rx="6" ry="4" fill="#f7a6b8" opacity=".6"/>';
+        if (c.nose) s += c.nose;
+        s += (c.mouth || '<path d="M45 56q5 5 10 0" stroke="#7a4a3a" stroke-width="2" fill="none" stroke-linecap="round"/>');
+        s += '</svg>';
+        return s;
+    }
+
+    var M = '<path d="M45 56q5 5 10 0" stroke="#7a4a3a" stroke-width="2" fill="none" stroke-linecap="round"/>';
+
     var ANIMALS = [
         // 鼠
-        '<svg viewBox="0 0 100 100"><circle cx="26" cy="26" r="15" fill="#b9bec9"/><circle cx="74" cy="26" r="15" fill="#b9bec9"/><circle cx="26" cy="26" r="8" fill="#f2b8c6"/><circle cx="74" cy="26" r="8" fill="#f2b8c6"/><ellipse cx="50" cy="56" rx="30" ry="28" fill="#c9cdd6"/><circle cx="40" cy="52" r="4" fill="#33323f"/><circle cx="60" cy="52" r="4" fill="#33323f"/><circle cx="50" cy="64" r="5" fill="#f2a8b8"/><path d="M30 60q-8 2-10 8M70 60q8 2 10 8" stroke="#9aa0ab" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+        chibi({
+            head: '#c9cdd6', body: '#c9cdd6',
+            ears: '<circle cx="23" cy="23" r="14" fill="#c9cdd6"/><circle cx="77" cy="23" r="14" fill="#c9cdd6"/><circle cx="23" cy="23" r="7.5" fill="#f2b8c6"/><circle cx="77" cy="23" r="7.5" fill="#f2b8c6"/>',
+            nose: '<circle cx="50" cy="52" r="4" fill="#f2a8b8"/>'
+        }),
         // 牛
-        '<svg viewBox="0 0 100 100"><path d="M20 30q-10-14 2-18 6 8 10 16Z" fill="#efe3d2"/><path d="M80 30q10-14-2-18-6 8-10 16Z" fill="#efe3d2"/><ellipse cx="50" cy="58" rx="32" ry="28" fill="#c58a5a"/><ellipse cx="50" cy="66" rx="16" ry="12" fill="#e6b98f"/><circle cx="38" cy="52" r="4" fill="#33323f"/><circle cx="62" cy="52" r="4" fill="#33323f"/><circle cx="44" cy="66" r="2.5" fill="#8a5a34"/><circle cx="56" cy="66" r="2.5" fill="#8a5a34"/></svg>',
+        chibi({
+            head: '#c58a5a', body: '#c58a5a',
+            ears: '<path d="M20 28q-12-14-2-20 5 9 13 15Z" fill="#efe3d2"/><path d="M80 28q12-14 2-20-5 9-13 15Z" fill="#efe3d2"/>',
+            nose: '<ellipse cx="50" cy="54" rx="13" ry="9" fill="#e6b98f"/><circle cx="45" cy="54" r="2.4" fill="#8a5a34"/><circle cx="55" cy="54" r="2.4" fill="#8a5a34"/>',
+            mouth: ''
+        }),
         // 虎
-        '<svg viewBox="0 0 100 100"><circle cx="26" cy="28" r="13" fill="#f0a63c"/><circle cx="74" cy="28" r="13" fill="#f0a63c"/><circle cx="26" cy="28" r="6" fill="#f7d3a0"/><circle cx="74" cy="28" r="6" fill="#f7d3a0"/><ellipse cx="50" cy="58" rx="31" ry="28" fill="#f5b552"/><path d="M40 34v8M50 32v9M60 34v8" stroke="#5a3b16" stroke-width="3" stroke-linecap="round"/><circle cx="39" cy="56" r="4" fill="#33323f"/><circle cx="61" cy="56" r="4" fill="#33323f"/><path d="M46 66q4 4 8 0" stroke="#5a3b16" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="44" cy="64" r="4" fill="#f3a0a0" opacity=".7"/><circle cx="56" cy="64" r="4" fill="#f3a0a0" opacity=".7"/></svg>',
+        chibi({
+            head: '#f5b552', body: '#f5b552',
+            ears: '<circle cx="23" cy="24" r="12" fill="#f5b552"/><circle cx="77" cy="24" r="12" fill="#f5b552"/><circle cx="23" cy="24" r="6" fill="#f7d3a0"/><circle cx="77" cy="24" r="6" fill="#f7d3a0"/>',
+            faceTop: '<path d="M40 24v9M50 22v10M60 24v9" stroke="#5a3b16" stroke-width="3" stroke-linecap="round"/>',
+            nose: '<path d="M45 51l5 4 5-4Z" fill="#8a1f1f"/>',
+            mouth: '<path d="M50 55v5M50 60q-5 4-9 0M50 60q5 4 9 0" stroke="#7a4a3a" stroke-width="2" fill="none" stroke-linecap="round"/>'
+        }),
         // 兔
-        '<svg viewBox="0 0 100 100"><ellipse cx="38" cy="24" rx="9" ry="20" fill="#f4f4f7"/><ellipse cx="38" cy="24" rx="4.5" ry="13" fill="#f2b8c6"/><ellipse cx="62" cy="24" rx="9" ry="20" fill="#f4f4f7"/><ellipse cx="62" cy="24" rx="4.5" ry="13" fill="#f2b8c6"/><ellipse cx="50" cy="62" rx="30" ry="28" fill="#ffffff"/><circle cx="40" cy="58" r="4" fill="#33323f"/><circle cx="60" cy="58" r="4" fill="#33323f"/><circle cx="50" cy="68" r="4" fill="#f2a8b8"/><path d="M46 72q4 4 8 0" stroke="#c98aa0" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+        chibi({
+            head: '#ffffff', body: '#ffffff', foot: '#eceaf2',
+            ears: '<ellipse cx="37" cy="13" rx="8" ry="21" fill="#ffffff"/><ellipse cx="37" cy="13" rx="4" ry="14" fill="#f2b8c6"/><ellipse cx="63" cy="13" rx="8" ry="21" fill="#ffffff"/><ellipse cx="63" cy="13" rx="4" ry="14" fill="#f2b8c6"/>',
+            nose: '<circle cx="50" cy="52" r="4" fill="#f2a8b8"/>'
+        }),
         // 龙
-        '<svg viewBox="0 0 100 100"><path d="M26 26l6-16 8 12Z" fill="#e8c86a"/><path d="M74 26l-6-16-8 12Z" fill="#e8c86a"/><ellipse cx="50" cy="58" rx="31" ry="28" fill="#5fbf6a"/><circle cx="39" cy="54" r="4.5" fill="#22331f"/><circle cx="61" cy="54" r="4.5" fill="#22331f"/><ellipse cx="50" cy="66" rx="14" ry="8" fill="#8fe08f"/><circle cx="45" cy="66" r="2.5" fill="#2f6b34"/><circle cx="55" cy="66" r="2.5" fill="#2f6b34"/><path d="M40 32v6M50 30v8M60 32v6" stroke="#2f8a3e" stroke-width="2.5" stroke-linecap="round"/></svg>',
+        chibi({
+            head: '#5fbf6a', body: '#5fbf6a',
+            ears: '<path d="M26 26l6-18 9 13Z" fill="#e8c86a"/><path d="M74 26l-6-18-9 13Z" fill="#e8c86a"/>',
+            nose: '<ellipse cx="50" cy="53" rx="10" ry="6" fill="#8fe08f"/><circle cx="45.5" cy="53" r="2" fill="#2f6b34"/><circle cx="54.5" cy="53" r="2" fill="#2f6b34"/>',
+            mouth: '<path d="M44 60q6 4 12 0" stroke="#7a4a3a" stroke-width="2" fill="none" stroke-linecap="round"/>'
+        }),
         // 蛇
-        '<svg viewBox="0 0 100 100"><ellipse cx="50" cy="52" rx="32" ry="30" fill="#7bd08a"/><circle cx="38" cy="48" r="4.5" fill="#22331f"/><circle cx="62" cy="48" r="4.5" fill="#22331f"/><path d="M50 64v8M50 72l-6 6M50 72l6 6" stroke="#e5566a" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="34" cy="60" r="3" fill="#4fa85f"/><circle cx="66" cy="60" r="3" fill="#4fa85f"/></svg>',
+        chibi({
+            head: '#7bd08a', body: '#7bd08a',
+            mouth: '<path d="M50 52v8M50 60l-6 6M50 60l6 6" stroke="#e5566a" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
+        }),
         // 马
-        '<svg viewBox="0 0 100 100"><path d="M34 24l-6-14 14 6Z" fill="#c98a4b"/><path d="M66 24l6-14-14 6Z" fill="#c98a4b"/><ellipse cx="50" cy="56" rx="29" ry="29" fill="#d9a06b"/><path d="M50 28q10 0 12 14-12-6-24 0Q40 28 50 28Z" fill="#7a4f2a"/><circle cx="40" cy="56" r="4" fill="#33323f"/><circle cx="60" cy="56" r="4" fill="#33323f"/><ellipse cx="50" cy="70" rx="12" ry="9" fill="#c98a4b"/><circle cx="45" cy="70" r="2.5" fill="#5a3b20"/><circle cx="55" cy="70" r="2.5" fill="#5a3b20"/></svg>',
+        chibi({
+            head: '#d9a06b', body: '#d9a06b',
+            ears: '<path d="M30 26l-8-16 15 6Z" fill="#c98a4b"/><path d="M70 26l8-16-15 6Z" fill="#c98a4b"/>',
+            faceTop: '<path d="M50 16q14 0 16 17-14-8-32 0Q36 16 50 16Z" fill="#7a4f2a"/>',
+            nose: '<ellipse cx="50" cy="55" rx="11" ry="8" fill="#c98a4b"/><circle cx="45.5" cy="55" r="2.2" fill="#5a3b20"/><circle cx="54.5" cy="55" r="2.2" fill="#5a3b20"/>',
+            mouth: ''
+        }),
         // 羊
-        '<svg viewBox="0 0 100 100"><circle cx="30" cy="30" r="12" fill="#fbf8f0"/><circle cx="70" cy="30" r="12" fill="#fbf8f0"/><circle cx="42" cy="24" r="11" fill="#fbf8f0"/><circle cx="58" cy="24" r="11" fill="#fbf8f0"/><ellipse cx="50" cy="60" rx="30" ry="27" fill="#f2ede0"/><path d="M28 40q-6-8 2-12M72 40q6-8-2-12" stroke="#d9c9a8" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="40" cy="58" r="4" fill="#4a4638"/><circle cx="60" cy="58" r="4" fill="#4a4638"/><circle cx="50" cy="68" r="4" fill="#d9b0a0"/></svg>',
+        chibi({
+            head: '#f2ede0', body: '#ffffff', foot: '#e8e1d2',
+            ears: '<circle cx="28" cy="27" r="12" fill="#fbf8f0"/><circle cx="72" cy="27" r="12" fill="#fbf8f0"/><circle cx="40" cy="21" r="11" fill="#fbf8f0"/><circle cx="60" cy="21" r="11" fill="#fbf8f0"/><path d="M20 33q-8-8 0-14M80 33q8-8 0-14" stroke="#d9c9a8" stroke-width="4" fill="none" stroke-linecap="round"/>',
+            nose: '<circle cx="50" cy="53" r="3.4" fill="#d9b0a0"/>'
+        }),
         // 猴
-        '<svg viewBox="0 0 100 100"><circle cx="22" cy="50" r="12" fill="#a9713f"/><circle cx="78" cy="50" r="12" fill="#a9713f"/><ellipse cx="50" cy="56" rx="30" ry="29" fill="#b97f4a"/><ellipse cx="50" cy="60" rx="20" ry="19" fill="#e6c19a"/><circle cx="41" cy="54" r="4" fill="#33323f"/><circle cx="59" cy="54" r="4" fill="#33323f"/><circle cx="46" cy="66" r="2" fill="#7a4f2a"/><circle cx="54" cy="66" r="2" fill="#7a4f2a"/><path d="M44 70q6 4 12 0" stroke="#7a4f2a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+        chibi({
+            head: '#b97f4a', body: '#b97f4a',
+            ears: '<circle cx="20" cy="46" r="12" fill="#a9713f"/><circle cx="80" cy="46" r="12" fill="#a9713f"/>',
+            faceTop: '<ellipse cx="50" cy="48" rx="22" ry="20" fill="#e6c19a"/>',
+            mouth: '<path d="M44 57q6 5 12 0" stroke="#7a4a3a" stroke-width="2" fill="none" stroke-linecap="round"/>'
+        }),
         // 鸡
-        '<svg viewBox="0 0 100 100"><path d="M36 20q4-12 10-6 4-10 8 0 6-6 10 6Z" fill="#e5566a"/><ellipse cx="50" cy="58" rx="30" ry="28" fill="#f0c94a"/><circle cx="40" cy="54" r="4" fill="#33323f"/><circle cx="60" cy="54" r="4" fill="#33323f"/><path d="M50 62l-8 8 16 0Z" fill="#f0913a"/><circle cx="44" cy="64" r="3" fill="#e5566a" opacity=".5"/><circle cx="56" cy="64" r="3" fill="#e5566a" opacity=".5"/></svg>',
+        chibi({
+            head: '#f0c94a', body: '#f0c94a',
+            ears: '<path d="M35 20q4-13 10-7 4-11 9 0 6-7 10 7Z" fill="#e5566a"/>',
+            nose: '<path d="M50 50l-8 8 16 0Z" fill="#f0913a"/>',
+            mouth: ''
+        }),
         // 狗
-        '<svg viewBox="0 0 100 100"><ellipse cx="22" cy="46" rx="12" ry="20" fill="#a9713f"/><ellipse cx="78" cy="46" rx="12" ry="20" fill="#a9713f"/><ellipse cx="50" cy="58" rx="30" ry="28" fill="#d29a5c"/><circle cx="40" cy="54" r="4" fill="#33323f"/><circle cx="60" cy="54" r="4" fill="#33323f"/><ellipse cx="50" cy="68" rx="12" ry="9" fill="#f0e2d0"/><ellipse cx="50" cy="63" rx="5" ry="4" fill="#33323f"/><path d="M50 67v6M50 73q-5 4-9 1M50 73q5 4 9 1" stroke="#33323f" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+        chibi({
+            head: '#d29a5c', body: '#d29a5c',
+            ears: '<ellipse cx="20" cy="46" rx="11" ry="20" fill="#a9713f"/><ellipse cx="80" cy="46" rx="11" ry="20" fill="#a9713f"/>',
+            nose: '<ellipse cx="50" cy="55" rx="12" ry="9" fill="#f0e2d0"/><ellipse cx="50" cy="50" rx="5" ry="4" fill="#33323f"/>',
+            mouth: '<path d="M50 54v5M50 59q-5 4-9 1M50 59q5 4 9 1" stroke="#33323f" stroke-width="2" fill="none" stroke-linecap="round"/>'
+        }),
         // 猪
-        '<svg viewBox="0 0 100 100"><path d="M26 30l-4-16 16 8Z" fill="#f2a0b4"/><path d="M74 30l4-16-16 8Z" fill="#f2a0b4"/><ellipse cx="50" cy="58" rx="31" ry="28" fill="#f7b8c6"/><circle cx="39" cy="52" r="4" fill="#33323f"/><circle cx="61" cy="52" r="4" fill="#33323f"/><ellipse cx="50" cy="68" rx="13" ry="10" fill="#f497ac"/><circle cx="45" cy="68" r="2.5" fill="#b3607a"/><circle cx="55" cy="68" r="2.5" fill="#b3607a"/></svg>'
+        chibi({
+            head: '#f7b8c6', body: '#f7b8c6',
+            ears: '<path d="M28 26l-4-16 16 8Z" fill="#f2a0b4"/><path d="M72 26l4-16-16 8Z" fill="#f2a0b4"/>',
+            nose: '<ellipse cx="50" cy="54" rx="12" ry="9" fill="#f497ac"/><circle cx="45.5" cy="54" r="2.3" fill="#b3607a"/><circle cx="54.5" cy="54" r="2.3" fill="#b3607a"/>',
+            mouth: ''
+        })
     ];
+
     var COLORS = ['#ef5350', '#ffa726', '#ffca28', '#66bb6a', '#26c6da', '#42a5f5', '#7e57c2', '#ec407a', '#8d6e63', '#26a69a', '#9ccc65', '#ab47bc'];
 
     var SLOT_MAX = 7;
@@ -44,6 +122,7 @@
     var leftEl = document.getElementById('left');
     var clearedEl = document.getElementById('cleared');
     var slotnEl = document.getElementById('slotn');
+    var soundBtn = document.getElementById('sound');
     var restartBtn = document.getElementById('restart');
     var overlay = document.getElementById('overlay');
     var ovTitle = document.getElementById('ov-title');
@@ -59,8 +138,52 @@
     var over = false;
     var TS = 56;
     var LAST_ORDER = [];
+    var soundOn = true;
+    var audioCtx = null;
 
     function randInt(n) { return Math.floor(Math.random() * n); }
+
+    function getAudio() {
+        if (!audioCtx) {
+            var AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) audioCtx = new AC();
+        }
+        if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+        return audioCtx;
+    }
+
+    function beep(freq, dur, type, vol, delay) {
+        if (!soundOn) return;
+        var ac = getAudio();
+        if (!ac) return;
+        var t0 = ac.currentTime + (delay || 0);
+        var osc = ac.createOscillator();
+        var gain = ac.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, t0);
+        gain.gain.setValueAtTime(vol || 0.06, t0);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        osc.connect(gain);
+        gain.connect(ac.destination);
+        osc.start(t0);
+        osc.stop(t0 + dur);
+    }
+
+    var sound = {
+        place: function () { beep(660, 0.06, 'sine', 0.04); },
+        clear: function () {
+            var seq = [523, 659, 784, 1047];
+            for (var i = 0; i < seq.length; i++) beep(seq[i], 0.16, 'sine', 0.07, i * 0.06);
+        },
+        win: function () {
+            var seq = [523, 659, 784, 1047, 1319];
+            for (var i = 0; i < seq.length; i++) beep(seq[i], 0.2, 'triangle', 0.07, i * 0.12);
+        },
+        lose: function () {
+            var seq = [400, 300, 200];
+            for (var i = 0; i < seq.length; i++) beep(seq[i], 0.25, 'sawtooth', 0.06, i * 0.14);
+        }
+    };
 
     function tint(type) {
         var hex = COLORS[type].replace('#', '');
@@ -123,7 +246,6 @@
 
         while (tiles.length % 3 !== 0 && tiles.length) tiles.pop();
 
-        // 合法的“依次点出”顺序
         var order = [];
         var remain = tiles.slice();
         while (remain.length) {
@@ -217,6 +339,7 @@
         if (over || tile.removed) return;
         if (isCovered(tile)) return;
         tile.removed = true;
+        sound.place();
         startFlight(tile);
         updateCovered();
     }
@@ -271,6 +394,7 @@
                 if (slotCells[three[k]]) slotCells[three[k]].classList.add('clearing');
             }
             cleared += 3;
+            sound.clear();
             updateHud();
             setTimeout(function () {
                 three.sort(function (a, b) { return b - a; }).forEach(function (i) { bar.splice(i, 1); });
@@ -291,6 +415,7 @@
 
     function win() {
         over = true;
+        sound.win();
         ovTitle.textContent = '通关！';
         ovText.innerHTML = '难度 ' + diffName() + ' · 消除 <b>' + cleared + '</b> 个';
         overlay.classList.remove('hidden');
@@ -298,6 +423,7 @@
 
     function gameOver() {
         over = true;
+        sound.lose();
         ovTitle.textContent = '槽位满了';
         ovText.innerHTML = '剩余 <b>' + remaining() + '</b> 个 · 已消 <b>' + cleared + '</b> 个';
         overlay.classList.remove('hidden');
@@ -325,6 +451,13 @@
         for (var i = 0; i < all.length; i++) all[i].classList.remove('active');
         b.classList.add('active');
         newGame();
+    });
+
+    soundBtn.addEventListener('click', function () {
+        soundOn = !soundOn;
+        soundBtn.classList.toggle('active', soundOn);
+        soundBtn.textContent = soundOn ? '音效' : '静音';
+        if (soundOn) sound.place();
     });
 
     restartBtn.addEventListener('click', newGame);

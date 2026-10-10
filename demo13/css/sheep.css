@@ -221,6 +221,17 @@ body {
 
 .act:active { transform: scale(0.97); }
 
+.act.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+.foot {
+    display: flex;
+    gap: 10px;
+}
+
 .overlay {
     position: fixed;
     inset: 0;

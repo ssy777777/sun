@@ -89,11 +89,11 @@
 
     function resize() {
         var rect = canvas.getBoundingClientRect();
-        cw = rect.width; ch = rect.height;
+        cw = Math.max(1, rect.width); ch = Math.max(1, rect.height);
         dpr = Math.min(window.devicePixelRatio || 1, 2);
         canvas.width = Math.round(cw * dpr);
         canvas.height = Math.round(ch * dpr);
-        scale = Math.min(cw / WORLD_W, ch / WORLD_H);
+        scale = Math.max(0.01, Math.min(cw / WORLD_W, ch / WORLD_H));
         offX = (cw - WORLD_W * scale) / 2;
         offY = (ch - WORLD_H * scale) / 2;
     }
@@ -518,14 +518,18 @@
     }
 
     function loop(t) {
-        if (!lastT) lastT = t;
-        var dt = Math.min((t - lastT) / 1000, 1 / 30);
-        lastT = t;
-        var steps = 2, h = dt / steps;
-        for (var i = 0; i < steps; i++) step(h);
-        for (var k = 0; k < blocks.length; k++) if (blocks[k].flash > 0) blocks[k].flash = Math.max(0, blocks[k].flash - dt * 3);
-        for (var q = 0; q < pigs.length; q++) if (pigs[q].flash > 0) pigs[q].flash = Math.max(0, pigs[q].flash - dt * 3);
-        render();
+        try {
+            if (!lastT) lastT = t;
+            var dt = Math.min((t - lastT) / 1000, 1 / 30);
+            lastT = t;
+            var steps = 2, h = dt / steps;
+            for (var i = 0; i < steps; i++) step(h);
+            for (var k = 0; k < blocks.length; k++) if (blocks[k].flash > 0) blocks[k].flash = Math.max(0, blocks[k].flash - dt * 3);
+            for (var q = 0; q < pigs.length; q++) if (pigs[q].flash > 0) pigs[q].flash = Math.max(0, pigs[q].flash - dt * 3);
+            render();
+        } catch (e) {
+            if (window.console && console.error) console.error('bird loop error:', e);
+        }
         requestAnimationFrame(loop);
     }
 
@@ -589,8 +593,13 @@
         soundBtn.textContent = soundOn ? '音效' : '静音';
     });
 
-    loadProg();
-    resize();
-    startLevel(Math.min(prog.unlocked - 1, LEVELS.length - 1));
+    try {
+        loadProg();
+        resize();
+        startLevel(Math.min(prog.unlocked - 1, LEVELS.length - 1));
+    } catch (e) {
+        if (window.console && console.error) console.error('bird init error:', e);
+    }
+    window.addEventListener('load', resize);
     requestAnimationFrame(loop);
 })();

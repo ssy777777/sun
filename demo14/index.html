@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#f4ecdc">
+    <title>诗词大作战</title>
+    <link rel="stylesheet" href="./css/poem.css">
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <h1>诗词大作战</h1>
+            <div class="rank">身份 <b id="rank">白丁</b></div>
+        </header>
+
+        <div class="hud">
+            <span>第 <b id="level">1</b> 关</span>
+            <span>剩余 <b id="left">0</b></span>
+            <span>卡槽 <b id="slotn">0/4</b></span>
+        </div>
+
+        <div class="board" id="board"></div>
+
+        <div class="hold" id="hold"></div>
+
+        <div class="tray" id="tray"></div>
+
+        <div class="props">
+            <button id="prop-out" class="act" type="button">移出 <b>1</b></button>
+            <button id="prop-shuffle" class="act" type="button">洗牌 <b>1</b></button>
+            <button id="prop-erase" class="act" type="button">消除一个 <b>1</b></button>
+        </div>
+
+        <div class="foot">
+            <button id="sound" class="act active" type="button">音效</button>
+            <button id="restart" class="act" type="button">从头再来</button>
+        </div>
+
+        <div class="overlay hidden" id="overlay">
+            <h2 id="ov-title"></h2>
+            <p id="ov-text"></p>
+            <div class="ov-actions" id="ov-actions"></div>
+        </div>
+    </div>
+
+    <script src="./js/poem.js"></script>
+</body>
+</html>

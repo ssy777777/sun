@@ -41,6 +41,11 @@ var APPS = [
         desc: '多层堆叠的消除玩法：点选顶层方块放进卡槽，集齐三个同类即可消除，槽满即败。',
         icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="3" width="10" height="10" rx="2"/><rect x="9" y="8" width="10" height="10" rx="2"/><rect x="6" y="12" width="10" height="10" rx="2" opacity=".55"/></svg>'
     },
+    {
+        cat: '小游戏', title: '诗词大作战', href: './demo14/', color: '#8d6e63',
+        desc: '把词语/成语拆成两半，选两半拼成完整词句即消除；卡槽 4 格，逐关晋升（平民→书生→…→状元→…→皇帝）。',
+        icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v6h6"/><path d="M8 12h8M8 16h5"/></svg>'
+    },
 
     // ---------- 记忆力训练 ----------
     {

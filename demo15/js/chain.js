@@ -29,19 +29,35 @@
     var pinyinCache = {};
     function pinyinOf(ch) {
         if (pinyinCache[ch] !== undefined) return pinyinCache[ch];
-        var p = PINYIN[ch] || null;
-        pinyinCache[ch] = p;
-        return p;
+        var raw = PINYIN[ch];
+        var arr = raw ? raw.split(/\s+/) : [];
+        pinyinCache[ch] = arr;
+        return arr;
     }
     function sameSound(a, b) {
         if (!a || !b) return false;
         if (a === b) return true;
         var pa = pinyinOf(a), pb = pinyinOf(b);
-        return !!(pa && pb && pa === pb);
+        if (!pa.length || !pb.length) return false;
+        for (var i = 0; i < pa.length; i++) {
+            if (pb.indexOf(pa[i]) !== -1) return true;
+        }
+        return false;
     }
+    var byPinyin = {};
+    WORDS.forEach(function (w) {
+        var ps = pinyinOf(w.charAt(0));
+        if (!ps.length) ps = [w.charAt(0)];
+        for (var i = 0; i < ps.length; i++) {
+            (byPinyin[ps[i]] = byPinyin[ps[i]] || []).push(w);
+        }
+    });
     function hasContinuation(char) {
-        for (var i = 0; i < WORDS.length; i++) {
-            if (sameSound(WORDS[i].charAt(0), char)) return true;
+        var ps = pinyinOf(char);
+        if (!ps.length) return false;
+        for (var i = 0; i < ps.length; i++) {
+            var bucket = byPinyin[ps[i]];
+            if (bucket && bucket.length) return true;
         }
         return false;
     }
@@ -101,9 +117,20 @@
     }
 
     function validContinuations(char) {
-        return WORDS.filter(function (w) {
-            return !used[w] && sameSound(w.charAt(0), char);
-        });
+        var ps = pinyinOf(char);
+        if (!ps.length) ps = [char];
+        var out = [], seen = {};
+        for (var i = 0; i < ps.length; i++) {
+            var bucket = byPinyin[ps[i]];
+            if (!bucket) continue;
+            for (var j = 0; j < bucket.length; j++) {
+                var w = bucket[j];
+                if (used[w] || seen[w]) continue;
+                seen[w] = 1;
+                out.push(w);
+            }
+        }
+        return out;
     }
 
     function renderChain() {

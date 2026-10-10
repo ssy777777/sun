@@ -65,6 +65,28 @@ body {
     font-size: 16px;
 }
 
+.modes,
+.diff {
+    display: flex;
+    gap: 8px;
+}
+
+.hide {
+    display: none !important;
+}
+
+.turn {
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent-2);
+}
+
+.turn.ai {
+    color: var(--bad);
+}
+
 .hud {
     display: flex;
     justify-content: space-between;
@@ -124,6 +146,10 @@ body {
     color: var(--muted);
     margin-right: 8px;
     font-weight: 400;
+}
+
+.chain span.ai {
+    color: var(--accent-2);
 }
 
 @keyframes pop {

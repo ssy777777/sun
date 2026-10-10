@@ -135,6 +135,7 @@
         var t = BIRD_TYPES[type];
         var body = new Phys.Body({ shape: Phys.Circle(t.r), position: V(SLING.x, SLING.y), density: t.density, restitution: 0.25, friction: 0.5, static: true });
         body.data = { kind: 'bird', type: type };
+        world.add(body);
         currentBird = { body: body, type: type, powerUsed: false, lowT: 0, done: false };
         activeBirds = [];
         dragPos = V(SLING.x, SLING.y);
@@ -154,8 +155,9 @@
 
     function showTapHint() {
         if (!currentBird) return;
-        var p = BIRD_TYPES[currentBird.type].power;
-        tapHint.textContent = p === 'none' ? '' : '飞行中点击屏幕：' + BIRD_TYPES[currentBird.type].label.split('·')[1];
+        var info = BIRD_TYPES[currentBird.type];
+        if (info.power === 'none') return;
+        tapHint.textContent = '飞行中点击屏幕：' + info.label.split('·')[1];
         tapHint.classList.add('show');
         setTimeout(function () { tapHint.classList.remove('show'); }, 1600);
     }

@@ -56,6 +56,11 @@ var APPS = [
         desc: '拖拽弹弓发射小鸟，击碎木/石/玻璃结构、消灭全部绿猪；自研 2D 物理，结构会堆叠倒塌。',
         icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="6"/><path d="M16 8h5l-5 3z"/><path d="M8 8.5h.01"/><path d="M2 22l3.5-3.5"/></svg>'
     },
+    {
+        cat: '小游戏', title: '跳一跳', href: './demo19/', color: '#f0913d',
+        desc: '按住蓄力、松手起跳，从一个方块跳到下一个；落在正中算「完美」并连击加分，越跳越远。',
+        icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="5.6" r="2.4"/><path d="M6.6 17.2c1.6-5.6 4.6-8.2 8.6-9.4"/><rect x="2" y="17" width="6.4" height="4.6" rx="1.2"/><rect x="15.6" y="14" width="6.4" height="4.6" rx="1.2"/></svg>'
+    },
 
     // ---------- 记忆力训练 ----------
     {

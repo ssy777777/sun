@@ -180,6 +180,8 @@ canvas {
 
 @media (max-width: 420px) {
     .top h1 { font-size: 18px; letter-spacing: 1px; }
-    .hud { gap: 8px; }
+    .hud { gap: 7px; }
     .hud b { font-size: 15px; }
+    .hud .score, .hud .best { font-size: 12px; }
+    .icon-btn { padding: 6px 8px; font-size: 12px; }
 }

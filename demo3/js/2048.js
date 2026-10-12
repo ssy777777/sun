@@ -20,6 +20,7 @@
     var overlayPrimary = document.getElementById('overlay-primary');
     var overlaySecondary = document.getElementById('overlay-secondary');
     var newGameBtn = document.getElementById('new-game');
+    var rankBtn = document.getElementById('rank-btn');
 
     var cells = [];
     var score = 0;
@@ -275,6 +276,7 @@
             over = true;
             showOverlay('游戏结束', '本局得分 ' + score,
                 '再来一局', newGame, null, null);
+            if (window.SunCloud && best > 0) SunCloud.submit('2048', best);
         }
     }
 
@@ -323,6 +325,7 @@
     }
 
     function newGame() {
+        if (window.SunCloud && best > 0) SunCloud.submit('2048', best);
         cells = new Array(SIZE * SIZE).fill(null);
         tileLayer.innerHTML = '';
         tileEls = {};
@@ -388,4 +391,10 @@
     window.addEventListener('orientationchange', function () {
         setTimeout(relayout, 250);
     });
+
+    if (window.SunCloud && rankBtn) {
+        rankBtn.addEventListener('click', function () {
+            SunCloud.openLeaderboard('2048', '2048 排行榜', best);
+        });
+    }
 })();

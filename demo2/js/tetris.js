@@ -20,6 +20,7 @@
     var pauseBtn = document.getElementById('pause-btn');
     var restartBtn = document.getElementById('restart-btn');
     var soundBtn = document.getElementById('sound-btn');
+    var rankBtn = document.getElementById('rank-btn');
     var comboEl = document.getElementById('combo');
     var overlayStats = document.getElementById('overlay-stats');
 
@@ -611,6 +612,7 @@
     }
 
     function startGame() {
+        if (window.SunCloud && best > 0) SunCloud.submit('tetris', best);
         if (clearTimer) {
             clearTimeout(clearTimer);
             clearTimer = null;
@@ -664,6 +666,7 @@
         draw();
         showOverlay('游戏结束', '本次得分 ' + score + '　最高 ' + best, '再来一局');
         renderStats();
+        if (window.SunCloud && best > 0) SunCloud.submit('tetris', best);
     }
 
     function toggleSound() {
@@ -845,4 +848,10 @@
     window.addEventListener('orientationchange', function () {
         setTimeout(updateLayout, 250);
     });
+
+    if (window.SunCloud && rankBtn) {
+        rankBtn.addEventListener('click', function () {
+            SunCloud.openLeaderboard('tetris', '俄罗斯方块 排行榜', best);
+        });
+    }
 })();

@@ -468,8 +468,13 @@ html.mobile .panel-actions {
     justify-self: stretch;
     width: 100%;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 8px;
     align-self: end;
+}
+
+html.mobile .panel-actions .btn {
+    flex: 1 1 calc(50% - 4px);
 }
 
 html.mobile .btn {

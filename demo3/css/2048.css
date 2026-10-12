@@ -234,6 +234,12 @@ body {
     color: var(--muted);
 }
 
+.foot-actions {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
 .btn {
     border: none;
     background: var(--board);
@@ -289,5 +295,23 @@ body {
 
     .board {
         width: min(94vw, calc(100dvh - 180px));
+    }
+
+    .app-footer {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .hint {
+        flex: 1 1 100%;
+        text-align: center;
+    }
+
+    .foot-actions {
+        width: 100%;
+    }
+
+    .foot-actions .btn {
+        flex: 1;
     }
 }

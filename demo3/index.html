@@ -40,10 +40,15 @@
 
         <footer class="app-footer">
             <p class="hint">电脑：方向键 / WASD　手机：滑动屏幕</p>
-            <button id="new-game" class="btn" type="button">重新开始</button>
+            <div class="foot-actions">
+                <button id="rank-btn" class="btn" type="button">排行榜</button>
+                <button id="new-game" class="btn" type="button">重新开始</button>
+            </div>
         </footer>
     </div>
 
-    <script src="./js/2048.js"></script>
+    <script src="../shared/cloud-config.js?v=1"></script>
+    <script src="../shared/cloud.js?v=1"></script>
+    <script src="./js/2048.js?v=2"></script>
 </body>
 </html>

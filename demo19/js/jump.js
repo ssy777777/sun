@@ -22,6 +22,7 @@
     var scoreEl = document.getElementById('score');
     var bestEl = document.getElementById('best');
     var soundBtn = document.getElementById('sound-btn');
+    var rankBtn = document.getElementById('rank-btn');
     var hintEl = document.getElementById('hint');
     var overlay = document.getElementById('overlay');
     var ovTitle = document.getElementById('ov-title');
@@ -270,6 +271,7 @@
         ovTitle.textContent = '游戏结束';
         ovText.innerHTML = '本次得分 <b>' + score + '</b>　最高连击 <b>' + (maxCombo || 0) + '</b><br>历史最佳 <b>' + best + '</b>';
         overlay.classList.remove('hidden');
+        if (window.SunCloud) SunCloud.submit('jump', best);
     }
 
     /* ================= 特效 ================= */
@@ -514,4 +516,14 @@
     reset();
     lastTime = performance.now();
     requestAnimationFrame(tick);
+
+    /* 云排行榜（未配置时 SunCloud.enabled 为 false，一切照旧） */
+    if (window.SunCloud) {
+        if (best > 0) SunCloud.submit('jump', best);
+        if (rankBtn) {
+            rankBtn.addEventListener('click', function () {
+                SunCloud.openLeaderboard('jump', '跳一跳 排行榜', Math.max(best, score));
+            });
+        }
+    }
 })();

@@ -61,6 +61,11 @@ var APPS = [
         desc: '按住蓄力、松手起跳，从一个方块跳到下一个；落在正中算「完美」并连击加分，越跳越远。',
         icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13" cy="5.6" r="2.4"/><path d="M6.6 17.2c1.6-5.6 4.6-8.2 8.6-9.4"/><rect x="2" y="17" width="6.4" height="4.6" rx="1.2"/><rect x="15.6" y="14" width="6.4" height="4.6" rx="1.2"/></svg>'
     },
+    {
+        cat: '小游戏', title: '保护王中王', href: './demo20/', color: '#f5b23d',
+        desc: '真人出镜塔防：在偷冠大军的必经之路上建塔，守住照片里的王中王 20 波。4 种塔、升级出售、表情变化与失败彩蛋。',
+        icon: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M3 8.2l4.3 3.2L12 4.6l4.7 6.8L21 8.2l-1.7 10.2c-.1.7-.7 1.2-1.4 1.2H6.1c-.7 0-1.3-.5-1.4-1.2L3 8.2z"/><circle cx="12" cy="15.7" r="1.1" fill="#0f1226" opacity=".45"/></svg>'
+    },
 
     // ---------- 记忆力训练 ----------
     {

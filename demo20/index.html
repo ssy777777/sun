@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0b241b">
+    <title>保护王中王</title>
+    <link rel="stylesheet" href="./css/king.css?v=1">
+</head>
+<body>
+    <div class="app" id="app">
+        <header class="top">
+            <div class="brand">
+                <span class="brand-crown" aria-hidden="true">♛</span>
+                <div class="brand-text">
+                    <h1>保护王中王</h1>
+                    <p>REAL PERSON TOWER DEFENSE</p>
+                </div>
+            </div>
+            <div class="hud">
+                <span class="chip"><i>波次</i><b id="hud-wave">1/20</b></span>
+                <span class="chip gold"><i>金币</i><b id="hud-gold">260</b></span>
+                <span class="chip hearts" id="hearts-chip"><i>王冠</i><b id="hud-hearts">10</b></span>
+            </div>
+            <div class="actions">
+                <button class="icon-btn on" id="sound-btn" type="button" title="音效" aria-label="音效">🔊</button>
+                <button class="icon-btn" id="speed-btn" type="button" title="加速" aria-label="加速">1×</button>
+                <button class="icon-btn" id="pause-btn" type="button" title="暂停" aria-label="暂停">⏸</button>
+                <button class="icon-btn" id="rank-btn" type="button" title="排行榜" aria-label="排行榜">🏆</button>
+            </div>
+        </header>
+
+        <div class="stage-wrap" id="stage-wrap">
+            <canvas id="stage"></canvas>
+            <div class="toast" id="toast"></div>
+            <div class="banner" id="banner">
+                <b id="banner-title"></b>
+                <span id="banner-sub"></span>
+            </div>
+            <div class="stage-hint" id="stage-hint">选一座塔 → 点亮光圈建造</div>
+        </div>
+
+        <section class="dock">
+            <div class="dock-main">
+                <div class="shop" id="shop"></div>
+                <div class="tower-panel" id="tower-panel" hidden>
+                    <div class="tp-main">
+                        <div class="tp-title"><b id="tp-name"></b><span id="tp-lv"></span></div>
+                        <div class="tp-stats" id="tp-stats"></div>
+                    </div>
+                    <div class="tp-btns">
+                        <button id="tp-up" type="button">升级</button>
+                        <button id="tp-sell" type="button">出售</button>
+                        <button id="tp-close" class="tp-close" type="button" aria-label="返回">✕</button>
+                    </div>
+                </div>
+            </div>
+            <button class="wave-btn" id="wave-btn" type="button">
+                <span class="wb-label" id="wave-btn-label">出发</span>
+                <span class="wb-sub" id="wave-btn-sub">第 1 波</span>
+            </button>
+        </section>
+    </div>
+
+    <!-- 开始 -->
+    <div class="overlay show" id="start-overlay">
+        <div class="panel start-panel">
+            <div class="start-portrait">
+                <span class="sp-crown" aria-hidden="true">♛</span>
+                <img src="./img/king-1.jpg" alt="王中王本人">
+                <span class="sp-tag">王中王 · 本人</span>
+            </div>
+            <p class="eyebrow">REAL PERSON TOWER DEFENSE</p>
+            <h2>保护王中王</h2>
+            <p class="story">偷冠大军盯上了王中王。建塔拦住它们，别让它们碰到他——不然他就要去足浴店办卡了。</p>
+            <ol class="tips">
+                <li>底部选一种塔，点亮地图上的光圈建造</li>
+                <li>点已建好的塔可以升级 / 出售</li>
+                <li>敌人碰到王中王会掉王冠，掉光就输</li>
+                <li>准备好了点「出发」，守住 20 波</li>
+            </ol>
+            <div class="panel-actions">
+                <button class="primary" id="start-btn" type="button">开始守塔</button>
+                <button class="ghost" id="start-rank" type="button">排行榜</button>
+            </div>
+            <p class="best-line" id="best-line"></p>
+        </div>
+    </div>
+
+    <!-- 暂停 -->
+    <div class="overlay" id="pause-overlay">
+        <div class="panel pause-panel">
+            <h2>暂停中</h2>
+            <p class="story">王中王正在喝口水，塔也先歇会儿。</p>
+            <div class="panel-actions column">
+                <button class="primary" id="resume-btn" type="button">继续守塔</button>
+                <button class="ghost" id="pause-restart" type="button">重新开始</button>
+                <button class="ghost" id="pause-rank" type="button">排行榜</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 结算 -->
+    <div class="overlay" id="end-overlay">
+        <div class="panel end-panel">
+            <div class="end-banner" id="end-banner">
+                <img id="end-img" src="./img/king-2.jpg" alt="">
+                <span class="end-tag" id="end-tag">王中王 · 已沦陷</span>
+            </div>
+            <h2 id="end-title">王中王被偷走了……</h2>
+            <p class="story" id="end-caption"></p>
+            <div class="stats" id="end-stats"></div>
+            <p class="best-line" id="end-best"></p>
+            <div class="panel-actions column">
+                <button class="primary" id="end-restart" type="button">再守一次</button>
+                <button class="ghost" id="end-rank" type="button">排行榜</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../shared/cloud-config.js?v=2"></script>
+    <script src="../shared/auth.js?v=2"></script>
+    <script src="../shared/cloud.js?v=4"></script>
+    <script src="../shared/welcome.js?v=1"></script>
+    <script src="./js/king.js?v=1"></script>
+</body>
+</html>

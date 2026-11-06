@@ -23,6 +23,7 @@
 - `demo17/` — 记忆宫殿（地点法记忆训练）
 - `demo18/` — 扑克牌记忆（顺序记忆训练）
 - `demo19/` — 跳一跳（蓄力跳跃）
+- `demo20/` — 保护王中王（真人照片塔防）
 - `apps.js` — 首页数据（“数据库”）+ 自动渲染
 - `index.html` — 根目录导航首页
 - `shared/` — 云排行榜共用脚本（`cloud-config.js` 填配置、`auth.js` 账号、`welcome.js` 欢迎页、`cloud.js` 客户端，纯 fetch 无依赖）

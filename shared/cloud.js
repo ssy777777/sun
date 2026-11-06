@@ -195,7 +195,7 @@
         return req(q).then(function (rows) { return rows || []; });
     }
 
-    var GAME_NAMES = { '2048': '2048', tetris: '俄罗斯方块', jump: '跳一跳' };
+    var GAME_NAMES = { '2048': '2048', tetris: '俄罗斯方块', jump: '跳一跳', king: '保护王中王' };
     function gameName(key) { return GAME_NAMES[key] || key; }
 
     /* 我的成绩（登录后按账号，游客按设备号） */

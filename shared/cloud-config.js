@@ -15,6 +15,6 @@
  *      绝对不要填 service_role key（那个能删库）。
  * ============================================================ */
 window.SUN_CLOUD = {
-    url: '',        // 例如 'https://abcdefghijk.supabase.co'
-    anonKey: ''     // 例如 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    url: 'https://moxewkzhpjmlealpbwuc.supabase.co',
+    anonKey: 'sb_publishable_YtBY9U3fytL6QB96APEf8w_TzPf4Zh-'
 };

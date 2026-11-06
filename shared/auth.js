@@ -39,9 +39,10 @@
     var listeners = [];
 
     /* ================= 基础 ================= */
-    function emit() {
+    function emit(reason) {
+        var meta = { reason: reason || 'change' };
         for (var i = 0; i < listeners.length; i++) {
-            try { listeners[i](user); } catch (e) { /* ignore */ }
+            try { listeners[i](user, meta); } catch (e) { /* ignore */ }
         }
     }
     function persist() {
@@ -50,7 +51,7 @@
             else localStorage.removeItem(SESSION_KEY);
         } catch (e) { /* ignore */ }
     }
-    function applyAuth(data) {
+    function applyAuth(data, reason) {
         if (!data || !data.access_token) return null;
         session = {
             access_token: data.access_token,
@@ -60,14 +61,14 @@
         };
         user = session.user;
         persist();
-        emit();
+        emit(reason || 'restore');
         return session;
     }
     function clearSession() {
         session = null;
         user = null;
         persist();
-        emit();
+        emit('logout');
     }
 
     /* ================= 错误提示 ================= */
@@ -127,7 +128,7 @@
     function refresh() {
         if (!ENABLED || !session || !session.refresh_token) return Promise.resolve(null);
         return call('POST', '/token?grant_type=refresh_token', { refresh_token: session.refresh_token })
-            .then(function (d) { return applyAuth(d); })
+            .then(function (d) { return applyAuth(d, 'restore'); })
             .catch(function () { clearSession(); return null; });
     }
 
@@ -150,7 +151,7 @@
 
         user = session.user || null;
         if (session.expires_at - Date.now() > REFRESH_AHEAD) {
-            emit();
+            emit('restore');
             readyResolve();
             return;
         }
@@ -161,14 +162,14 @@
     function login(email, password) {
         if (!ENABLED) return Promise.reject(new Error('登录未配置'));
         return call('POST', '/token?grant_type=password', { email: email, password: password })
-            .then(function (d) { applyAuth(d); return user; });
+            .then(function (d) { applyAuth(d, 'login'); return user; });
     }
 
     function signup(email, password) {
         if (!ENABLED) return Promise.reject(new Error('登录未配置'));
         return call('POST', '/signup', { email: email, password: password }).then(function (d) {
-            if (d && d.access_token) { applyAuth(d); return { ok: true, session: true }; }
-            if (d && d.session && d.session.access_token) { applyAuth(d.session); return { ok: true, session: true }; }
+            if (d && d.access_token) { applyAuth(d, 'signup'); return { ok: true, session: true }; }
+            if (d && d.session && d.session.access_token) { applyAuth(d.session, 'signup'); return { ok: true, session: true }; }
             // 开启了“邮箱验证”时，这里只拿到 user，需要用户去邮箱点确认
             return { ok: true, needConfirm: true };
         });
@@ -191,7 +192,7 @@
                 user = d;
                 if (session) session.user = d;
                 persist();
-                emit();
+                emit('update');
             }
             return user;
         });

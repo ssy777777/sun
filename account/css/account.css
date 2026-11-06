@@ -143,6 +143,23 @@ body {
     margin-top: 2px;
 }
 
+.seat {
+    display: none;
+    align-self: flex-start;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #ffd98a;
+    background: linear-gradient(120deg, rgba(255, 209, 102, 0.14), rgba(247, 161, 196, 0.1));
+    border: 1px solid rgba(255, 209, 102, 0.32);
+    box-shadow: 0 0 22px -8px rgba(255, 209, 102, 0.6);
+}
+
+.seat.on { display: inline-flex; align-items: center; gap: 6px; }
+
+.seat b { color: #fff; font-weight: 900; }
+
 .field {
     display: block;
     font-size: 12px;

@@ -210,6 +210,21 @@
         });
     }
 
+    /* 我的注册序号（profiles.seq，仅本人可读） */
+    var seqCache = null;
+    function mySeq() {
+        if (!ENABLED) return Promise.resolve(null);
+        return whenReady().then(function () {
+            var u = authUser();
+            if (!u || !u.id) return null;
+            if (seqCache !== null) return seqCache;
+            return req('/profiles?select=seq&id=eq.' + encodeURIComponent(u.id)).then(function (rows) {
+                if (rows && rows.length) seqCache = Number(rows[0].seq) || null;
+                return seqCache;
+            }).catch(function () { return null; });
+        });
+    }
+
     /* ---------------- 身份变化：本机成绩改挂到新身份 ---------------- */
     var activeModal = null;      // 当前打开的榜单弹层：{ account, reload }
 
@@ -236,6 +251,7 @@
         window.SunAuth.ready.then(function () { identitySnap = identityKey(); });
         window.SunAuth.onChange(function () {
             var now = identityKey();
+            seqCache = null;
             if (identitySnap === null) { identitySnap = now; return; }
             if (now === identitySnap) {
                 // 身份没变（比如只改了昵称）：刷新弹层里的账号行即可
@@ -468,6 +484,7 @@
         submit: submit,
         top: top,
         mine: mine,
+        mySeq: mySeq,
         gameName: gameName,
         syncName: syncName,
         openLeaderboard: openLeaderboard,

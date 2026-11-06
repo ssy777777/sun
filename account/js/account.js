@@ -16,6 +16,7 @@
     var nameInput = document.getElementById('name-input');
     var hintEl = document.getElementById('me-hint');
     var scoreList = document.getElementById('score-list');
+    var seatEl = document.getElementById('me-seat');
 
     var GAME_HREF = { '2048': '../demo3/', tetris: '../demo2/', jump: '../demo19/' };
 
@@ -50,7 +51,20 @@
         emailEl.textContent = u.email || '';
         avatarEl.textContent = (n || '?').slice(0, 1).toUpperCase();
         if (document.activeElement !== nameInput) nameInput.value = n || '';
+        loadSeat();
         loadScores();
+    }
+
+    /* 注册序号：只给本人看；前 100 位算创始玩家 */
+    function loadSeat() {
+        if (!CLOUD || !CLOUD.mySeq || !seatEl) return;
+        CLOUD.mySeq().then(function (seq) {
+            if (!seq) { seatEl.classList.remove('on'); return; }
+            seatEl.innerHTML = seq <= 100
+                ? '🏅 第 <b>' + seq + '</b> 位加入 · 创始玩家'
+                : '第 <b>' + seq + '</b> 位加入';
+            seatEl.classList.add('on');
+        });
     }
 
     function loadScores() {

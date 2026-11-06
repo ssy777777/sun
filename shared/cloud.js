@@ -17,6 +17,7 @@
 
     var CFG = window.SUN_CLOUD || {};
     var URL_BASE = String(CFG.url || '').replace(/\/+$/, '');
+    var REST = URL_BASE + '/rest/v1';
     var ANON = String(CFG.anonKey || '');
     var ENABLED = !!(URL_BASE && ANON);
 
@@ -42,49 +43,83 @@
         }
         return id;
     }
-    function getName() {
-        var n = store(NAME_KEY);
-        if (n) return n;
-        var def = '无名侠' + deviceId().slice(-4);
-        return def;
+
+    /* ---------------- 身份（登录优先，游客用设备号） ---------------- */
+    function authUser() {
+        return (window.SunAuth && window.SunAuth.user) || null;
     }
+    function whenReady() {
+        return (window.SunAuth && window.SunAuth.ready) ? window.SunAuth.ready : Promise.resolve();
+    }
+    function identity() {
+        var u = authUser();
+        return (u && u.id) ? ('u:' + u.id) : deviceId();
+    }
+    function identityKey() {
+        var u = authUser();
+        return (u && u.id) ? 'u:' + u.id : 'guest';
+    }
+    function getToken() {
+        if (window.SunAuth && window.SunAuth.enabled) {
+            return window.SunAuth.token().then(function (t) { return t || null; }, function () { return null; });
+        }
+        return Promise.resolve(null);
+    }
+
+    function getName() {
+        var u = authUser();
+        if (u) {
+            var meta = u.user_metadata || {};
+            if (meta.name) return String(meta.name).slice(0, 12);
+            if (u.email) return u.email.split('@')[0].slice(0, 12);
+            return '玩家';
+        }
+        return store(NAME_KEY) || ('无名侠' + deviceId().slice(-4));
+    }
+
     function setName(n) {
         n = String(n || '').replace(/[\s<>]/g, '').slice(0, 12);
-        if (n) store(NAME_KEY, n);
-        return getName();
+        if (!n) return Promise.resolve(getName());
+        if (authUser() && window.SunAuth.updateName) {
+            return window.SunAuth.updateName(n).then(function () { return getName(); });
+        }
+        store(NAME_KEY, n);
+        return Promise.resolve(n);
     }
 
     /* ---------------- HTTP ---------------- */
     function req(path, opts) {
         opts = opts || {};
-        return new Promise(function (resolve, reject) {
-            var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
-            var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT);
-            var headers = {
-                apikey: ANON,
-                Authorization: 'Bearer ' + ANON,
-                'Content-Type': 'application/json'
-            };
-            if (opts.headers) for (var k in opts.headers) if (opts.headers.hasOwnProperty(k)) headers[k] = opts.headers[k];
+        return getToken().then(function (tok) {
+            return new Promise(function (resolve, reject) {
+                var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+                var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT);
+                var headers = {
+                    apikey: ANON,
+                    Authorization: 'Bearer ' + (tok || ANON),
+                    'Content-Type': 'application/json'
+                };
+                if (opts.headers) for (var k in opts.headers) if (opts.headers.hasOwnProperty(k)) headers[k] = opts.headers[k];
 
-            fetch(URL_BASE + path, {
-                method: opts.method || 'GET',
-                headers: headers,
-                body: opts.body,
-                signal: ctrl ? ctrl.signal : undefined
-            }).then(function (r) {
-                clearTimeout(timer);
-                if (!r.ok) {
-                    return r.text().then(function (t) {
-                        reject(new Error('HTTP ' + r.status + ' ' + String(t).slice(0, 160)));
-                    });
-                }
-                var ct = r.headers.get('content-type') || '';
-                if (ct.indexOf('json') < 0) return resolve(null);
-                return r.json().then(resolve, function () { resolve(null); });
-            }).catch(function (e) {
-                clearTimeout(timer);
-                reject(e);
+                fetch(REST + path, {
+                    method: opts.method || 'GET',
+                    headers: headers,
+                    body: opts.body,
+                    signal: ctrl ? ctrl.signal : undefined
+                }).then(function (r) {
+                    clearTimeout(timer);
+                    if (!r.ok) {
+                        return r.text().then(function (t) {
+                            reject(new Error('HTTP ' + r.status + ' ' + String(t).slice(0, 160)));
+                        });
+                    }
+                    var ct = r.headers.get('content-type') || '';
+                    if (ct.indexOf('json') < 0) return resolve(null);
+                    return r.json().then(resolve, function () { resolve(null); });
+                }).catch(function (e) {
+                    clearTimeout(timer);
+                    reject(e);
+                });
             });
         });
     }
@@ -104,8 +139,14 @@
         }
         if (!ENABLED) return Promise.resolve({ ok: false, reason: 'disabled' });
 
+        return whenReady().then(function () {
+            return submitNow(game, score);
+        });
+    }
+
+    function submitNow(game, score) {
         var row = {
-            device_id: deviceId(),
+            device_id: identity(),
             game: game,
             name: getName(),
             score: score,
@@ -136,6 +177,7 @@
                 throw e;
             });
         }).then(function (res) {
+            var last = lastMap();
             last[game] = score;
             store(LAST_KEY, JSON.stringify(last));
             return res;
@@ -153,6 +195,66 @@
         return req(q).then(function (rows) { return rows || []; });
     }
 
+    var GAME_NAMES = { '2048': '2048', tetris: '俄罗斯方块', jump: '跳一跳' };
+    function gameName(key) { return GAME_NAMES[key] || key; }
+
+    /* 我的成绩（登录后按账号，游客按设备号） */
+    function mine() {
+        if (!ENABLED) return Promise.resolve([]);
+        return whenReady().then(function () {
+            var q = '/' + TABLE +
+                '?select=game,score,updated_at' +
+                '&device_id=eq.' + encodeURIComponent(identity()) +
+                '&order=updated_at.desc&limit=100';
+            return req(q).then(function (rows) { return rows || []; });
+        });
+    }
+
+    /* ---------------- 身份变化：本机成绩改挂到新身份 ---------------- */
+    var activeModal = null;      // 当前打开的榜单弹层：{ account, reload }
+
+    /* 改昵称后同步到自己名下的所有榜单行 */
+    function syncName() {
+        if (!ENABLED || !authUser()) return Promise.resolve();
+        return req('/' + TABLE + '?device_id=eq.' + encodeURIComponent(identity()), {
+            method: 'PATCH',
+            body: JSON.stringify({ name: getName() }),
+            headers: { Prefer: 'return=minimal' }
+        }).catch(function () { /* 昵称同步失败不影响主流程 */ });
+    }
+
+    function resubmitAll() {
+        var prev = lastMap();
+        store(LAST_KEY, '{}');
+        for (var g in prev) {
+            if (prev.hasOwnProperty(g)) submit(g, prev[g], true);
+        }
+    }
+
+    var identitySnap = null;
+    if (window.SunAuth && window.SunAuth.onChange) {
+        window.SunAuth.ready.then(function () { identitySnap = identityKey(); });
+        window.SunAuth.onChange(function () {
+            var now = identityKey();
+            if (identitySnap === null) { identitySnap = now; return; }
+            if (now === identitySnap) {
+                // 身份没变（比如只改了昵称）：刷新弹层里的账号行即可
+                if (activeModal) activeModal.account();
+                return;
+            }
+            var wasGuest = identitySnap === 'guest';
+            identitySnap = now;
+            if (wasGuest) {
+                // 游客 → 登录：把本机各游戏成绩挂到账号下
+                resubmitAll();
+            } else {
+                // 登录 → 游客：只清掉去重记录，避免把账号成绩重复写成游客成绩
+                store(LAST_KEY, '{}');
+            }
+            if (activeModal) { activeModal.account(); activeModal.reload(); }
+        });
+    }
+
     /* ---------------- 弹层 UI ---------------- */
     var CSS = [
         '.sc-overlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:18px;',
@@ -166,6 +268,11 @@
         '.sc-close{border:0;background:rgba(255,255,255,.24);color:#fff;width:28px;height:28px;border-radius:50%;',
         'font-size:15px;line-height:1;cursor:pointer;font-family:inherit}',
         '.sc-sub{padding:9px 16px 2px;font-size:12px;color:#7c93a8}',
+        '.sc-account{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 16px 2px;',
+        'font-size:12px;color:#7c93a8}',
+        '.sc-account b{color:#21384f}',
+        '.sc-link{border:0;background:#eef3f8;color:#4a63e8;border-radius:7px;padding:5px 10px;font-size:12px;',
+        'font-weight:700;font-family:inherit;cursor:pointer}',
         '.sc-list{flex:1;overflow:auto;padding:6px 10px 10px;-webkit-overflow-scrolling:touch}',
         '.sc-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;font-size:14px}',
         '.sc-row+.sc-row{margin-top:3px}',
@@ -211,6 +318,7 @@
     function close() {
         if (openEl && openEl.parentNode) openEl.parentNode.removeChild(openEl);
         openEl = null;
+        activeModal = null;
         if (escHandler) { document.removeEventListener('keydown', escHandler); escHandler = null; }
     }
 
@@ -228,6 +336,7 @@
                     '<button class="sc-close" type="button" aria-label="关闭">✕</button>' +
                 '</div>' +
                 '<div class="sc-sub"></div>' +
+                '<div class="sc-account"></div>' +
                 '<div class="sc-list"><div class="sc-empty">加载中…</div></div>' +
                 '<div class="sc-me"><label>昵称</label>' +
                     '<input class="sc-name" maxlength="12" value="' + esc(getName()) + '">' +
@@ -238,6 +347,7 @@
             '</div>';
 
         var subEl = ov.querySelector('.sc-sub');
+        var accEl = ov.querySelector('.sc-account');
         var listEl = ov.querySelector('.sc-list');
         var nameEl = ov.querySelector('.sc-name');
         var msgEl = ov.querySelector('.sc-msg');
@@ -245,19 +355,43 @@
 
         function msg(t) { msgEl.textContent = t || ''; }
 
+        function renderAccountRow() {
+            if (!window.SunAuth || !window.SunAuth.enabled) {
+                accEl.style.display = 'none';
+                return;
+            }
+            accEl.style.display = '';
+            var u = authUser();
+            if (u) {
+                accEl.innerHTML = '<span>已登录 <b>' + esc(getName()) + '</b></span>' +
+                    '<button class="sc-link" type="button">账号</button>';
+            } else {
+                accEl.innerHTML = '<span>游客模式 · 登录后成绩跨设备</span>' +
+                    '<button class="sc-link" type="button">登录</button>';
+            }
+            accEl.querySelector('.sc-link').addEventListener('click', function () {
+                if (window.SunAuth) window.SunAuth.open();
+            });
+        }
+
         ov.querySelector('.sc-close').addEventListener('click', close);
         ov.addEventListener('click', function (e) { if (e.target === ov) close(); });
         escHandler = function (e) { if (e.key === 'Escape') close(); };
         document.addEventListener('keydown', escHandler);
 
         ov.querySelector('.sc-save').addEventListener('click', function () {
-            setName(nameEl.value);
-            nameEl.value = getName();
-            msg('昵称已保存，下次上报生效');
+            setName(nameEl.value).then(function () {
+                nameEl.value = getName();
+                msg(authUser() ? '昵称已保存到账号' : '昵称已保存，下次上报生效');
+                if (authUser()) syncName();
+            }).catch(function (e) {
+                msg('保存失败：' + e.message);
+            });
         });
 
         document.body.appendChild(ov);
         openEl = ov;
+        renderAccountRow();
 
         if (!ENABLED) {
             subEl.textContent = '未启用';
@@ -291,7 +425,7 @@
         });
 
         function render(rows) {
-            var mine = deviceId();
+            var mine = identity();
             if (!rows.length) {
                 listEl.innerHTML = '<div class="sc-empty">还没有人上榜<br>做个第一吧 🥇</div>';
                 return;
@@ -321,6 +455,10 @@
         }
 
         footEl.querySelector('[data-refresh]').addEventListener('click', function () { msg(''); load(); });
+        activeModal = {
+            account: renderAccountRow,
+            reload: load
+        };
         load();
     }
 
@@ -329,10 +467,14 @@
         enabled: ENABLED,
         submit: submit,
         top: top,
+        mine: mine,
+        gameName: gameName,
+        syncName: syncName,
         openLeaderboard: openLeaderboard,
         close: close,
         getName: getName,
         setName: setName,
-        deviceId: deviceId
+        deviceId: deviceId,
+        identity: identity
     };
 })();

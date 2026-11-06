@@ -25,8 +25,9 @@
 - `demo19/` — 跳一跳（蓄力跳跃）
 - `apps.js` — 首页数据（“数据库”）+ 自动渲染
 - `index.html` — 根目录导航首页
-- `shared/` — 云排行榜共用脚本（`cloud-config.js` 填配置、`cloud.js` 客户端，纯 fetch 无依赖）
-- `排行榜接入.md` — Supabase 云排行榜接入说明（建表 SQL / 安全 / FAQ）
+- `shared/` — 云排行榜共用脚本（`cloud-config.js` 填配置、`auth.js` 账号、`cloud.js` 客户端，纯 fetch 无依赖）
+- `account/` — 账号页（登录状态 / 改昵称 / 退出 / 我的排行榜成绩）
+- `排行榜接入.md` — Supabase 云排行榜与登录接入说明（建表 SQL / 安全 / FAQ）
 
 全部手机 / 电脑双端。首页卡片由 `apps.js` 的 `APPS` 数组生成，编号自动（`CONFIG` 控制）。
 

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0f1226">
+    <title>我的账号</title>
+    <link rel="stylesheet" href="./css/account.css?v=1">
+</head>
+<body>
+    <div class="app">
+        <header class="top">
+            <a class="back" href="../">← 返回首页</a>
+            <h1>我的账号</h1>
+            <p class="sub">登录后，排行榜成绩与昵称都会跟着账号走</p>
+        </header>
+
+        <section id="setup" class="card hide">
+            <h2>登录还没配置</h2>
+            <p>先在 <code>shared/cloud-config.js</code> 填入 Supabase 的 <code>url</code> 与 <code>anonKey</code>，
+               再按根目录 <b>排行榜接入.md</b> 第七节完成设置，然后刷新本页。</p>
+            <p class="muted">没配置时网站其余部分不受影响，排行榜与账号功能只是不可用。</p>
+        </section>
+
+        <section id="guest" class="card hide">
+            <div class="hero">👤</div>
+            <h2>登录 / 注册</h2>
+            <p>登录后：排行榜成绩<b>跨设备同步</b>、昵称跟着账号走；以后的刷题进度、错题本也能同步到云端。</p>
+            <button id="login-btn" class="btn primary" type="button">登录 / 注册</button>
+        </section>
+
+        <section id="member" class="card hide">
+            <div class="me">
+                <div class="avatar" id="avatar">?</div>
+                <div class="me-info">
+                    <b id="me-name">玩家</b>
+                    <span id="me-email"></span>
+                </div>
+            </div>
+            <label class="field">
+                <span>昵称（排行榜显示）</span>
+                <input id="name-input" maxlength="12" placeholder="1~12 个字符">
+            </label>
+            <div class="row">
+                <button id="save-name" class="btn primary" type="button">保存昵称</button>
+                <button id="logout-btn" class="btn ghost" type="button">退出登录</button>
+            </div>
+            <p class="hint" id="me-hint"></p>
+        </section>
+
+        <section id="scores" class="card hide">
+            <h2>我的排行榜成绩</h2>
+            <div id="score-list" class="score-list">
+                <div class="empty">加载中…</div>
+            </div>
+        </section>
+
+        <p class="foot">账号与密码由 Supabase Auth 托管，本站不保存你的密码。</p>
+    </div>
+
+    <script src="../shared/cloud-config.js?v=1"></script>
+    <script src="../shared/auth.js?v=1"></script>
+    <script src="../shared/cloud.js?v=2"></script>
+    <script src="./js/account.js?v=1"></script>
+</body>
+</html>

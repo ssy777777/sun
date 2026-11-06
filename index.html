@@ -232,6 +232,38 @@
             letter-spacing: 0.5px;
         }
 
+        .account-entry {
+            position: fixed;
+            top: 14px;
+            right: 14px;
+            z-index: 20;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid var(--line);
+            background: rgba(25, 28, 54, 0.72);
+            -webkit-backdrop-filter: blur(8px);
+            backdrop-filter: blur(8px);
+            color: var(--text);
+            text-decoration: none;
+            font-size: 13px;
+            transition: border-color 0.16s ease;
+        }
+
+        .account-entry.on { display: inline-flex; }
+        .account-entry:hover { border-color: var(--accent); }
+
+        .account-entry .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #43e0c0;
+        }
+
+        .account-entry .dot.off { background: #5f6699; }
+
         @media (max-width: 560px) {
             body { gap: 30px; padding: 34px 16px; }
             .groups { gap: 28px; }
@@ -241,6 +273,11 @@
     </style>
 </head>
 <body>
+    <a id="account-entry" class="account-entry" href="./account/">
+        <span id="acct-dot" class="dot off"></span>
+        <span id="acct-text">登录 / 注册</span>
+    </a>
+
     <header>
         <span class="eyebrow">FRONT-END PRACTICE</span>
         <h1>前端练习项目</h1>
@@ -251,6 +288,32 @@
 
     <footer>© 前端练习项目 · Built with HTML / CSS / JS</footer>
 
+    <script src="./shared/cloud-config.js?v=1"></script>
+    <script src="./shared/auth.js?v=1"></script>
     <script src="./apps.js"></script>
+    <script>
+        /* 首页右上角账号入口：未配置 Supabase 时不显示 */
+        (function () {
+            var entry = document.getElementById('account-entry');
+            var dot = document.getElementById('acct-dot');
+            var text = document.getElementById('acct-text');
+            if (!window.SunAuth || !SunAuth.enabled) return;
+
+            entry.classList.add('on');
+
+            function render() {
+                var u = SunAuth.user;
+                if (u) {
+                    dot.classList.remove('off');
+                    text.textContent = SunAuth.displayName() || '我的账号';
+                } else {
+                    dot.classList.add('off');
+                    text.textContent = '登录 / 注册';
+                }
+            }
+            SunAuth.ready.then(render);
+            SunAuth.onChange(render);
+        })();
+    </script>
 </body>
 </html>
